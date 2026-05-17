@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard — NeuroPCB</title>
+<link rel="stylesheet" href="assets/styles.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+  aside.sidebar { background: var(--bg-1); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+  main.content { padding: 32px 40px; overflow-y: auto; max-height: 100vh; }
+  .sidebar-section { padding: 16px 12px; }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; border-radius: 7px;
+    font-size: 13px; color: var(--text-2); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sidebar-link:hover { background: var(--bg-2); color: var(--text-1); }
+  .sidebar-link.active { background: var(--bg-3); color: var(--text-1); }
+  .sidebar-link.active svg { color: var(--accent); }
+  .sidebar-link svg { color: var(--text-3); }
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #5b8def, #8b5cf6, #2dd4bf);
+    border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .topbar {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 24px; border-bottom: 1px solid var(--border);
+    background: var(--bg-0); position: sticky; top: 0; z-index: 10;
+  }
+  .project-card { cursor: pointer; transition: all 0.2s; }
+  .project-card:hover { border-color: var(--border-l); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  .project-thumb {
+    width: 100%; aspect-ratio: 16/10;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 56px;
+    background: var(--bg-2);
+  }
+  .menu-dropdown {
+    position: absolute; top: 100%; right: 0; margin-top: 4px;
+    background: var(--bg-2); border: 1px solid var(--border-l);
+    border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    min-width: 180px; z-index: 100;
+    display: none;
+  }
+  .menu-dropdown.show { display: block; }
+  .menu-item { padding: 8px 12px; font-size: 13px; cursor: pointer; }
+  .menu-item:hover { background: var(--bg-3); }
+  .quick-stat {
+    background: var(--bg-1); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px;
+  }
+  .quick-stat .label { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .quick-stat .value { font-size: 24px; font-weight: 700; }
+
+  .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+  .grid-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 1024px) { .grid-stats { grid-template-columns: repeat(2, 1fr); } }
+
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(7, 8, 13, 0.7);
+    backdrop-filter: blur(8px); z-index: 100;
+    display: none; align-items: center; justify-content: center;
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: var(--bg-1); border: 1px solid var(--border-l);
+    border-radius: 14px; width: 560px; max-width: 90vw;
+    max-height: 86vh; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .modal-body { padding: 20px; overflow-y: auto; }
+  .modal-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+
+  .template-pick {
+    display: flex; gap: 12px; padding: 12px;
+    border-radius: 10px; cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+  .template-pick:hover { border-color: var(--border-l); background: var(--bg-2); }
+  .template-pick.selected { border-color: var(--accent); background: rgba(91, 141, 239, 0.05); }
+  .template-thumb {
+    width: 56px; height: 56px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; flex-shrink: 0;
+  }
+  .activity-item {
+    display: flex; gap: 10px; padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .activity-item:last-child { border-bottom: 0; }
+  .activity-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: var(--bg-2); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  .table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+  .table th { text-align: left; padding: 10px 12px; color: var(--text-3); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); }
+  .table td { padding: 12px; border-bottom: 1px solid var(--border); }
+  .table tr:hover td { background: var(--bg-2); }
+
+  .toast-stack { position: fixed; bottom: 24px; right: 24px; z-index: 200; display: flex; flex-direction: column-reverse; gap: 8px; }
+  .toast {
+    background: var(--bg-2); border: 1px solid var(--border-l);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px; border-radius: 8px; min-width: 280px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+</style>
+</head>
+<body>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar">
+  <div style="padding: 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border);">
+    <span class="logo-mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.07 7.07 4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.07-7.07 4.24-4.24"/></svg></span>
+    <div style="flex: 1;">
+      <div style="font-weight: 700; font-size: 13px;">NeuroPCB</div>
+      <div id="workspace-name" class="text-xs text-faint mono">workspace</div>
+    </div>
+    <button class="btn btn-icon" title="Buscar (Ctrl+K)" onclick="openPalette()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+  </div>
+
+  <div class="sidebar-section">
+    <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="openNewProject()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Novo projeto
+    </button>
+  </div>
+
+  <div class="sidebar-section" style="padding-top: 0; flex: 1;">
+    <div class="sidebar-link active" data-route="overview" onclick="navigate('overview')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Visão geral
+    </div>
+    <div class="sidebar-link" data-route="projects" onclick="navigate('projects')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      Projetos
+      <span class="badge" id="projects-count" style="margin-left: auto; background: var(--bg-3); color: var(--text-2);">0</span>
+    </div>
+    <div class="sidebar-link" data-route="templates" onclick="navigate('templates')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Templates
+    </div>
+    <div class="sidebar-link" data-route="library" onclick="navigate('library')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Biblioteca de componentes
+    </div>
+    <div class="sidebar-link" data-route="team" onclick="navigate('team')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Time
+    </div>
+    <div class="sidebar-link" data-route="billing" onclick="navigate('billing')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Faturamento
+    </div>
+    <div class="sidebar-link" data-route="settings" onclick="navigate('settings')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Configurações
+    </div>
+  </div>
+
+  <div style="padding: 12px; border-top: 1px solid var(--border);">
+    <div id="user-card" style="display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 8px; cursor: pointer; position: relative;" onclick="document.getElementById('user-menu').classList.toggle('show')">
+      <div id="user-avatar"></div>
+      <div style="flex: 1; min-width: 0;">
+        <div id="user-name" class="text-sm font-medium" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
+        <div id="user-plan" class="text-xs text-faint mono"></div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      <div id="user-menu" class="menu-dropdown" style="top: auto; bottom: 100%; margin-bottom: 4px;">
+        <div class="menu-item" onclick="navigate('settings')">Perfil & Settings</div>
+        <div class="menu-item" onclick="navigate('billing')">Faturamento</div>
+        <div class="menu-item" onclick="location.href='docs.html'">Documentação</div>
+        <div style="height: 1px; background: var(--border); margin: 4px 0;"></div>
+        <div class="menu-item" style="color: var(--danger);" onclick="logout()">Sair</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ============ MAIN ============ -->
+<main class="content">
+  <div id="route-content"></div>
+</main>
+
+<!-- ============ NEW PROJECT MODAL ============ -->
+<div id="modal-new-project" class="modal-bg">
+  <div class="modal">
+    <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between;">
+      <div>
+        <div class="text-base font-semibold">Criar novo projeto</div>
+        <div class="text-xs text-faint">Escolha um template para começar</div>
+      </div>
+      <button class="btn btn-icon" onclick="closeModal('modal-new-project')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom: 16px;">
+        <label class="text-xs text-muted" style="display: block; margin-bottom: 6px;">Nome do projeto</label>
+        <input id="new-name" type="text" placeholder="Ex: Voice Assistant V2"/>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <label class="text-xs text-muted" style="display: block; margin-bottom: 6px;">Descrição (opcional)</label>
+        <input id="new-desc" type="text" placeholder="O que esta placa faz?"/>
+      </div>
+      <div>
+        <label class="text-xs text-muted" style="display: block; margin-bottom: 10px;">Template</label>
+        <div id="template-picker" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-new-project')">Cancelar</button>
+      <button class="btn btn-primary" onclick="createProjectAction()">Criar projeto</button>
+    </div>
+  </div>
+</div>
+
+<!-- Command palette -->
+<div id="palette-bg" class="modal-bg" style="align-items: flex-start; padding-top: 14vh;">
+  <div class="modal" style="width: 580px;">
+    <div style="padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="palette-input" type="text" placeholder="Buscar projetos, comandos, ações..." style="border: 0; background: transparent; padding: 0;"/>
+      <span class="kbd">ESC</span>
+    </div>
+    <div id="palette-items" style="max-height: 320px; overflow-y: auto; padding: 4px;"></div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toasts"></div>
+
+<script type="module">
+import { getSession, requireSession, signOut, avatarHTML, PLANS } from "./assets/auth.js";
+import { TEMPLATES, listProjects, getProject, createProject, deleteProject, seedProjects, formatRelativeTime, ACTIVITY, NOTIFICATIONS } from "./assets/data.js";
+
+const session = requireSession();
+if (!session) throw new Error("redirecting");
+
+seedProjects(session);
+
+// ============ SIDEBAR USER ============
+document.getElementById("workspace-name").textContent = session.workspace.name;
+document.getElementById("user-avatar").innerHTML = avatarHTML(session, 32);
+document.getElementById("user-name").textContent = session.name;
+const plan = PLANS[session.plan] || PLANS.free;
+document.getElementById("user-plan").innerHTML = `${plan.name} · ${plan.price === 0 ? "Grátis" : "R$" + plan.price + "/mês"}`;
+document.getElementById("projects-count").textContent = listProjects().length;
+
+window.logout = () => { if (confirm("Deseja sair?")) signOut(); };
+
+// ============ ROUTING ============
+const routes = {
+  overview: renderOverview,
+  projects: renderProjects,
+  templates: renderTemplates,
+  library: renderLibrary,
+  team: renderTeam,
+  billing: renderBilling,
+  settings: renderSettings,
+};
+
+function navigate(route) {
+  document.querySelectorAll(".sidebar-link").forEach(l => l.classList.toggle("active", l.dataset.route === route));
+  location.hash = "#/" + route;
+  (routes[route] || renderOverview)();
+  // close menus
+  document.getElementById("user-menu").classList.remove("show");
+}
+window.navigate = navigate;
+
+window.addEventListener("hashchange", () => {
+  const r = location.hash.replace("#/", "") || "overview";
+  document.querySelectorAll(".sidebar-link").forEach(l => l.classList.toggle("active", l.dataset.route === r));
+  (routes[r] || renderOverview)();
+});
+
+const initialRoute = location.hash.replace("#/", "") || "overview";
+document.querySelectorAll(".sidebar-link").forEach(l => l.classList.toggle("active", l.dataset.route === initialRoute));
+(routes[initialRoute] || renderOverview)();
+
+// ============ RENDER: OVERVIEW ============
+function renderOverview() {
+  const projects = listProjects();
+  const recent = projects.slice(0, 6);
+  const root = document.getElementById("route-content");
+  root.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <div>
+        <div class="text-2xl font-bold">Olá, ${session.name.split(" ")[0]} 👋</div>
+        <div class="text-sm text-muted">Aqui está um resumo do seu workspace.</div>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-outline" onclick="openPalette()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Buscar <span class="kbd">Ctrl K</span>
+        </button>
+        <button class="btn btn-primary" onclick="openNewProject()">+ Novo projeto</button>
+      </div>
+    </div>
+
+    <div class="grid-stats" style="margin-bottom: 32px;">
+      <div class="quick-stat">
+        <div class="label">Projetos ativos</div>
+        <div class="value">${projects.filter(p => p.status === "active").length}</div>
+        <div class="text-xs text-success">+2 esta semana</div>
+      </div>
+      <div class="quick-stat">
+        <div class="label">Mensagens AI</div>
+        <div class="value">42 <span class="text-sm text-faint">/ ${plan.ai}</span></div>
+        <div class="text-xs text-faint">Renova em 24 dias</div>
+      </div>
+      <div class="quick-stat">
+        <div class="label">Colaboradores</div>
+        <div class="value">3 <span class="text-sm text-faint">/ ${plan.collab}</span></div>
+        <div class="text-xs text-faint">2 online agora</div>
+      </div>
+      <div class="quick-stat">
+        <div class="label">Plano</div>
+        <div class="value">${plan.name}</div>
+        ${session.plan === "free" ? `<a href="#/billing" class="text-xs text-accent" onclick="navigate('billing'); return false;">Upgrade para Pro →</a>` : `<div class="text-xs text-success">✓ Ativo</div>`}
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div class="text-base font-semibold">Projetos recentes</div>
+          <a href="#/projects" class="text-sm text-accent" onclick="navigate('projects'); return false;">Ver todos →</a>
+        </div>
+        <div class="grid-cards">
+          ${recent.map(p => projectCard(p)).join("")}
+        </div>
+      </div>
+
+      <div>
+        <div class="text-base font-semibold" style="margin-bottom: 12px;">Atividade do time</div>
+        <div class="card" style="padding: 4px 16px;">
+          ${ACTIVITY.map(a => `
+            <div class="activity-item">
+              <div class="activity-icon">${{edit:"✏️",comment:"💬",deploy:"🚀",invite:"👥",billing:"💳"}[a.type]}</div>
+              <div style="flex: 1; min-width: 0;">
+                <div class="text-sm"><strong>${a.who}</strong> ${a.what}</div>
+                <div class="text-xs text-faint">${formatRelativeTime(a.when)}</div>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function projectCard(p) {
+  const template = TEMPLATES.find(t => t.id === p.template);
+  return `
+    <div class="card project-card" style="padding: 14px; position: relative;" onclick="openProject('${p.id}')">
+      <div class="project-thumb" style="background: ${template?.color || 'var(--bg-2)'}; margin-bottom: 12px;">
+        ${p.thumbnail || template?.icon || "📦"}
+      </div>
+      <div style="display: flex; align-items: start; justify-content: space-between; gap: 8px;">
+        <div style="flex: 1; min-width: 0;">
+          <div class="text-sm font-semibold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</div>
+          <div class="text-xs text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.desc || ""}</div>
+        </div>
+        ${p.status === "active" ? `<span class="badge badge-success" style="flex-shrink: 0;">Ativo</span>` : `<span class="badge" style="background: var(--bg-3); color: var(--text-3);">Draft</span>`}
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);">
+        <div class="text-xs text-faint">${formatRelativeTime(p.updatedAt)}</div>
+        <div class="text-xs text-faint">${p.components} comp</div>
+      </div>
+    </div>
+  `;
+}
+
+// ============ RENDER: PROJECTS ============
+function renderProjects() {
+  const projects = listProjects();
+  const root = document.getElementById("route-content");
+  root.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <div>
+        <div class="text-2xl font-bold">Projetos</div>
+        <div class="text-sm text-muted">${projects.length} ${projects.length === 1 ? 'projeto' : 'projetos'} no workspace</div>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <input id="search-projects" type="search" placeholder="Buscar projetos..." style="width: 260px;"/>
+        <button class="btn btn-primary" onclick="openNewProject()">+ Novo projeto</button>
+      </div>
+    </div>
+    <div id="projects-grid" class="grid-cards">
+      ${projects.map(p => projectCard(p)).join("")}
+    </div>
+  `;
+  document.getElementById("search-projects").addEventListener("input", (e) => {
+    const q = e.target.value.toLowerCase();
+    const filtered = projects.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      p.desc?.toLowerCase().includes(q) ||
+      p.tags?.some(t => t.toLowerCase().includes(q))
+    );
+    document.getElementById("projects-grid").innerHTML = filtered.map(p => projectCard(p)).join("") ||
+      `<div class="text-muted" style="grid-column: 1 / -1; text-align: center; padding: 32px;">Nenhum projeto encontrado</div>`;
+  });
+}
+
+// ============ RENDER: TEMPLATES ============
+function renderTemplates() {
+  const root = document.getElementById("route-content");
+  root.innerHTML = `
+    <div style="margin-bottom: 24px;">
+      <div class="text-2xl font-bold">Templates de placas</div>
+      <div class="text-sm text-muted">Comece de hardware real validado com modelos LLM</div>
+    </div>
+    <div class="grid-cards" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));">
+      ${TEMPLATES.map(t => `
+        <div class="card project-card" style="overflow: hidden;" onclick="openNewProjectWithTemplate('${t.id}')">
+          <div class="project-thumb" style="background: ${t.color}; aspect-ratio: 16/8; border-radius: 0; font-size: 64px;">${t.icon}</div>
+          <div style="padding: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <strong class="text-sm">${t.name}</strong>
+              ${t.tier === 'pro' ? '<span class="badge badge-pro">PRO</span>' :
+                t.tier === 'enterprise' ? '<span class="badge" style="background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white;">ENTERPRISE</span>' :
+                '<span class="badge badge-success">FREE</span>'}
+            </div>
+            <p class="text-xs text-muted" style="margin: 0 0 10px; line-height: 1.5;">${t.desc}</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px; color: var(--text-3); margin-bottom: 10px;">
+              <div>⚡ ${t.tops} TOPS</div>
+              <div>💾 ${t.ram}</div>
+              <div>📦 ${t.components} comp</div>
+              <div>🔀 ${t.layers} layers</div>
+            </div>
+            <div class="text-xs mono" style="color: var(--success);">${t.benchmark}</div>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+// ============ RENDER: LIBRARY ============
+function renderLibrary() {
+  const components = [
+    { ref: "U1", part: "RK3588", mfg: "Rockchip", desc: "8-core SoC · NPU 6 TOPS", pkg: "FCBGA-1144" },
+    { ref: "U2", part: "H9HCNNNBKMMLXR-NEE", mfg: "SK hynix", desc: "LPDDR4X 8GB · 4266 Mbps", pkg: "FBGA-200" },
+    { ref: "U3", part: "SDINBDG4-64G", mfg: "SanDisk/WD", desc: "eMMC 5.1 64GB HS400", pkg: "FBGA-153" },
+    { ref: "U4", part: "TPS65219RNQR", mfg: "Texas Instruments", desc: "PMIC · 3 buck + 4 LDO", pkg: "VQFN-32" },
+    { ref: "U5", part: "RTL8125BG-CG", mfg: "Realtek", desc: "2.5GbE PCIe controller", pkg: "QFN-64" },
+    { ref: "U6", part: "STM32G031K8T6", mfg: "STMicro", desc: "Cortex-M0+ companion MCU", pkg: "LQFP-32" },
+    { ref: "U7", part: "TUSB422RUKR", mfg: "Texas Instruments", desc: "USB-C PD 3.0 controller", pkg: "WQFN-20" },
+    { ref: "J1", part: "632723300011", mfg: "Würth Elektronik", desc: "USB-C 24-pin PD 3.0", pkg: "TYPE-C SMD" },
+    { ref: "J3", part: "AS0B826-S78N7-7H", mfg: "Foxconn", desc: "M.2 M-key 2280 PCIe x4", pkg: "M.2 connector" },
+    { ref: "J4", part: "0826-1G1T-K2-F", mfg: "Bel Fuse", desc: "RJ45 2.5GbE magnetics", pkg: "MagJack" },
+  ];
+  const root = document.getElementById("route-content");
+  root.innerHTML = `
+    <div style="margin-bottom: 24px;">
+      <div class="text-2xl font-bold">Biblioteca de componentes</div>
+      <div class="text-sm text-muted">Componentes reais com datasheets, parts disponíveis para qualquer projeto</div>
+    </div>
+    <input id="lib-search" type="search" placeholder="Buscar por part number, fabricante, descrição..." style="margin-bottom: 16px; max-width: 480px;"/>
+    <div class="card" style="overflow: hidden;">
+      <table class="table">
+        <thead>
+          <tr><th>Ref</th><th>Part Number</th><th>Fabricante</th><th>Descrição</th><th>Package</th><th></th></tr>
+        </thead>
+        <tbody id="lib-body">
+          ${components.map(c => `
+            <tr>
+              <td><span class="mono text-xs" style="color: var(--accent);">${c.ref}</span></td>
+              <td class="mono">${c.part}</td>
+              <td>${c.mfg}</td>
+              <td class="text-muted">${c.desc}</td>
+              <td class="mono text-xs text-faint">${c.pkg}</td>
+              <td><button class="btn btn-sm">📄 Datasheet</button></td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+  document.getElementById("lib-search").addEventListener("input", (e) => {
+    const q = e.target.value.toLowerCase();
+    const filtered = components.filter(c =>
+      c.part.toLowerCase().includes(q) || c.mfg.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q)
+    );
+    document.getElementById("lib-body").innerHTML = filtered.map(c => `
+      <tr><td><span class="mono text-xs" style="color: var(--accent);">${c.ref}</span></td><td class="mono">${c.part}</td><td>${c.mfg}</td><td class="text-muted">${c.desc}</td><td class="mono text-xs text-faint">${c.pkg}</td><td><button class="btn btn-sm">📄 Datasheet</button></td></tr>`).join("");
+  });
+}
+
+// ============ RENDER: TEAM ============
+function renderTeam() {
+  const root = document.getElementById("route-content");
+  const members = [
+    { name: session.name, email: session.email, role: "Owner", status: "online" },
+    { name: "Ana Martins", email: "ana@neuropcb.io", role: "Editor", status: "online" },
+    { name: "Bruno Santos", email: "bruno@neuropcb.io", role: "Editor", status: "online" },
+    { name: "Carla Rocha", email: "carla@neuropcb.io", role: "Viewer", status: "offline" },
+  ];
+  root.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <div>
+        <div class="text-2xl font-bold">Time</div>
+        <div class="text-sm text-muted">${members.length} membros · ${plan.collab} ${plan.collab === 1 ? 'permitido' : 'permitidos'} no plano ${plan.name}</div>
+      </div>
+      <button class="btn btn-primary" onclick="toast('💌 Convite enviado por email (simulado)')">+ Convidar membro</button>
+    </div>
+    <div class="card" style="overflow: hidden;">
+      <table class="table">
+        <thead><tr><th>Membro</th><th>Email</th><th>Status</th><th>Função</th><th></th></tr></thead>
+        <tbody>
+          ${members.map(m => `
+            <tr>
+              <td><div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#5b8def,#8b5cf6);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:white;">${m.name.split(" ").map(s=>s[0]).join("").slice(0,2)}</div>
+                <span class="font-medium">${m.name}</span>
+              </div></td>
+              <td class="text-muted">${m.email}</td>
+              <td>${m.status === "online" ? '<span class="badge badge-success"><span class="pulse-dot"></span> Online</span>' : '<span class="text-faint">offline</span>'}</td>
+              <td>${m.role}</td>
+              <td><button class="btn btn-sm">Editar</button></td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ============ RENDER: BILLING ============
+function renderBilling() {
+  const root = document.getElementById("route-content");
+  root.innerHTML = `
+    <div style="margin-bottom: 24px;">
+      <div class="text-2xl font-bold">Faturamento</div>
+      <div class="text-sm text-muted">Gerencie seu plano, faturas e métodos de pagamento</div>
+    </div>
+
+    <div class="card" style="padding: 24px; margin-bottom: 24px; background: linear-gradient(135deg, rgba(91,141,239,0.05), rgba(139,92,246,0.05));">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div>
+          <div class="text-xs text-faint mono" style="margin-bottom: 4px;">PLANO ATUAL</div>
+          <div class="text-3xl font-bold">${plan.name}</div>
+          <div class="text-sm text-muted" style="margin: 4px 0 0;">${plan.price === 0 ? "Sem custo" : "R$" + plan.price + "/mês · próxima cobrança em 24 dias"}</div>
+        </div>
+        ${session.plan === 'free' ? `<button class="btn btn-primary btn-lg" onclick="toast('🎉 Upgrade simulado · em produção seria Stripe Checkout')">Upgrade para Pro</button>` : `<button class="btn btn-outline">Mudar plano</button>`}
+      </div>
+      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+        <div><div class="text-xs text-faint">Projetos</div><div class="font-semibold">${listProjects().length}/${plan.projects}</div></div>
+        <div><div class="text-xs text-faint">AI Copilot</div><div class="font-semibold">42/${plan.ai}</div></div>
+        <div><div class="text-xs text-faint">Colaboradores</div><div class="font-semibold">3/${plan.collab}</div></div>
+        <div><div class="text-xs text-faint">Export</div><div class="font-semibold mono text-xs">${plan.export.join(", ")}</div></div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+      <div class="card" style="padding: 20px;">
+        <div class="text-base font-semibold" style="margin-bottom: 16px;">Histórico de faturas</div>
+        <table class="table">
+          <thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>15/05/2026</td><td>NeuroPCB ${plan.name} · Mensal</td><td class="mono">R$${plan.price.toFixed(2)}</td><td><span class="badge badge-success">Paga</span></td><td><button class="btn btn-sm">PDF</button></td></tr>
+            <tr><td>15/04/2026</td><td>NeuroPCB ${plan.name} · Mensal</td><td class="mono">R$${plan.price.toFixed(2)}</td><td><span class="badge badge-success">Paga</span></td><td><button class="btn btn-sm">PDF</button></td></tr>
+            <tr><td>15/03/2026</td><td>NeuroPCB ${plan.name} · Mensal</td><td class="mono">R$${plan.price.toFixed(2)}</td><td><span class="badge badge-success">Paga</span></td><td><button class="btn btn-sm">PDF</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card" style="padding: 20px;">
+        <div class="text-base font-semibold" style="margin-bottom: 12px;">Método de pagamento</div>
+        <div style="padding: 14px; background: var(--bg-2); border-radius: 8px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <div style="width: 38px; height: 26px; background: linear-gradient(135deg, #5b8def, #8b5cf6); border-radius: 4px;"></div>
+          <div style="flex: 1;">
+            <div class="text-sm font-medium">•••• 4242</div>
+            <div class="text-xs text-faint">Expira 12/27</div>
+          </div>
+          <span class="badge badge-success">Padrão</span>
+        </div>
+        <button class="btn btn-outline" style="width: 100%; justify-content: center;">+ Adicionar cartão</button>
+      </div>
+    </div>
+  `;
+}
+
+// ============ RENDER: SETTINGS ============
+function renderSettings() {
+  const root = document.getElementById("route-content");
+  root.innerHTML = `
+    <div style="margin-bottom: 24px;">
+      <div class="text-2xl font-bold">Configurações</div>
+      <div class="text-sm text-muted">Gerencie sua conta e preferências</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+      <div class="card" style="padding: 20px;">
+        <div class="text-base font-semibold" style="margin-bottom: 16px;">Perfil</div>
+        <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 20px;">
+          ${avatarHTML(session, 56)}
+          <button class="btn btn-outline">Trocar foto</button>
+        </div>
+        <div style="margin-bottom: 12px;"><label class="text-xs text-muted">Nome</label><input type="text" value="${session.name}"/></div>
+        <div style="margin-bottom: 12px;"><label class="text-xs text-muted">Email</label><input type="email" value="${session.email}"/></div>
+        <div style="margin-bottom: 16px;"><label class="text-xs text-muted">Workspace</label><input type="text" value="${session.workspace.name}"/></div>
+        <button class="btn btn-primary">Salvar alterações</button>
+      </div>
+
+      <div class="card" style="padding: 20px;">
+        <div class="text-base font-semibold" style="margin-bottom: 16px;">API Keys</div>
+        <p class="text-sm text-muted" style="margin-bottom: 12px;">Use chaves para integrar NeuroPCB no seu CI/CD ou ferramentas custom.</p>
+        <div style="background: var(--bg-2); padding: 12px; border-radius: 8px; margin-bottom: 12px; display: flex; gap: 8px; align-items: center;">
+          <span class="mono text-xs" style="flex: 1;">npcb_live_•••••••••••••••••2k4f</span>
+          <button class="btn btn-sm">Copiar</button>
+          <button class="btn btn-sm" style="color: var(--danger);">Revogar</button>
+        </div>
+        <button class="btn btn-outline">+ Gerar nova chave</button>
+      </div>
+
+      <div class="card" style="padding: 20px;">
+        <div class="text-base font-semibold" style="margin-bottom: 16px;">Notificações</div>
+        <label style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;"><input type="checkbox" checked style="width: auto;"/> Email quando alguém comentar</label>
+        <label style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;"><input type="checkbox" checked style="width: auto;"/> Email para novos modelos suportados</label>
+        <label style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;"><input type="checkbox" style="width: auto;"/> Newsletter semanal</label>
+      </div>
+
+      <div class="card" style="padding: 20px; border-color: var(--danger);">
+        <div class="text-base font-semibold" style="margin-bottom: 8px; color: var(--danger);">Zona de perigo</div>
+        <p class="text-sm text-muted" style="margin-bottom: 16px;">Ações irreversíveis. Tenha certeza antes de prosseguir.</p>
+        <button class="btn" style="background: rgba(248, 113, 113, 0.1); color: var(--danger);" onclick="if(confirm('Tem certeza? Esta ação é permanente.')) toast('🗑️ Conta marcada para exclusão (simulado)')">Excluir conta permanentemente</button>
+      </div>
+    </div>
+  `;
+}
+
+// ============ MODALS ============
+let selectedTemplate = "tpl-rk3588";
+
+window.openNewProject = function() {
+  document.getElementById("new-name").value = "";
+  document.getElementById("new-desc").value = "";
+  selectedTemplate = "tpl-rk3588";
+  document.getElementById("template-picker").innerHTML = TEMPLATES.map(t => `
+    <div class="template-pick ${t.id === selectedTemplate ? "selected" : ""}" data-id="${t.id}" onclick="selectTemplate('${t.id}')">
+      <div class="template-thumb" style="background: ${t.color};">${t.icon}</div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span class="text-sm font-semibold">${t.name}</span>
+          ${t.tier === 'pro' ? '<span class="badge badge-pro">PRO</span>' :
+            t.tier === 'enterprise' ? '<span class="badge" style="background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white;">ENT</span>' :
+            '<span class="badge badge-success">FREE</span>'}
+        </div>
+        <div class="text-xs text-muted" style="margin-top: 2px;">${t.desc}</div>
+      </div>
+    </div>
+  `).join("");
+  document.getElementById("modal-new-project").classList.add("show");
+};
+
+window.openNewProjectWithTemplate = function(tplId) {
+  selectedTemplate = tplId;
+  window.openNewProject();
+};
+
+window.selectTemplate = function(id) {
+  selectedTemplate = id;
+  document.querySelectorAll(".template-pick").forEach(el => el.classList.toggle("selected", el.dataset.id === id));
+};
+
+window.closeModal = function(id) {
+  document.getElementById(id).classList.remove("show");
+};
+
+window.createProjectAction = function() {
+  const name = document.getElementById("new-name").value.trim();
+  if (!name) { toast("⚠️ Dê um nome ao projeto"); return; }
+  const desc = document.getElementById("new-desc").value.trim();
+  const tpl = TEMPLATES.find(t => t.id === selectedTemplate);
+  const p = createProject({
+    name, desc, template: selectedTemplate,
+    components: tpl.components, thumbnail: tpl.icon,
+    tags: [], status: "active",
+    collaborators: [session.name]
+  });
+  closeModal("modal-new-project");
+  toast(`✓ Projeto "${name}" criado`);
+  setTimeout(() => openProject(p.id), 200);
+};
+
+window.openProject = function(id) {
+  location.href = `editor.html?project=${id}`;
+};
+
+// ============ COMMAND PALETTE ============
+window.openPalette = function() {
+  document.getElementById("palette-bg").classList.add("show");
+  document.getElementById("palette-input").value = "";
+  renderPalette("");
+  setTimeout(() => document.getElementById("palette-input").focus(), 50);
+};
+window.closePalette = function() { document.getElementById("palette-bg").classList.remove("show"); };
+
+function renderPalette(q) {
+  const projects = listProjects();
+  const items = [
+    ...projects.map(p => ({ icon: p.thumbnail || "📦", label: p.name, desc: "Projeto · " + formatRelativeTime(p.updatedAt), action: () => openProject(p.id) })),
+    { icon: "➕", label: "Criar novo projeto", desc: "Escolher template", action: () => openNewProject() },
+    { icon: "📐", label: "Templates", desc: "Ver biblioteca de placas", action: () => navigate("templates") },
+    { icon: "📦", label: "Biblioteca de componentes", desc: "Catálogo de parts", action: () => navigate("library") },
+    { icon: "👥", label: "Convidar membro", desc: "Adicionar ao workspace", action: () => navigate("team") },
+    { icon: "💳", label: "Faturamento", desc: "Plano e faturas", action: () => navigate("billing") },
+    { icon: "⚙️", label: "Configurações", desc: "Perfil e preferências", action: () => navigate("settings") },
+    { icon: "📚", label: "Documentação", desc: "Abrir docs", action: () => location.href = "docs.html" },
+    { icon: "🚪", label: "Sair", desc: "Logout", action: () => logout() },
+  ].filter(it => !q || it.label.toLowerCase().includes(q.toLowerCase()) || it.desc.toLowerCase().includes(q.toLowerCase()));
+
+  document.getElementById("palette-items").innerHTML = items.map((it, i) => `
+    <div class="menu-item" style="display: flex; gap: 10px; padding: 10px 12px; border-radius: 6px;" onclick="(${it.action.toString()})(); closePalette();">
+      <span style="font-size: 18px;">${it.icon}</span>
+      <div style="flex: 1; min-width: 0;">
+        <div class="text-sm">${it.label}</div>
+        <div class="text-xs text-faint">${it.desc}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+document.getElementById("palette-input").addEventListener("input", (e) => renderPalette(e.target.value));
+document.getElementById("palette-bg").addEventListener("click", (e) => { if (e.target.id === "palette-bg") closePalette(); });
+
+window.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "k") { e.preventDefault(); openPalette(); }
+  else if (e.key === "Escape") {
+    closePalette();
+    document.querySelectorAll(".modal-bg").forEach(m => m.classList.remove("show"));
+    document.getElementById("user-menu")?.classList.remove("show");
+  }
+});
+
+// click outside user menu
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#user-card")) document.getElementById("user-menu")?.classList.remove("show");
+});
+
+// ============ TOAST ============
+window.toast = function(msg) {
+  const t = document.createElement("div");
+  t.className = "toast"; t.textContent = msg;
+  document.getElementById("toasts").appendChild(t);
+  setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 300); }, 3500);
+};
+
+// Welcome
+setTimeout(() => toast(`👋 Olá ${session.name.split(" ")[0]}! Use Ctrl+K para buscar.`), 400);
+</script>
+</body>
+</html>

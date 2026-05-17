@@ -1,103 +1,154 @@
-# NeuroPCB · RK3588 Edge LLM Reference Board Viewer
+# NeuroPCB · EDA AI-native para hardware de IA na borda
 
-Visualizador web profissional de projetos eletrônicos com foco em placas para **modelos de IA destilados** rodando na borda. Plataforma de referência: **Rockchip RK3588** (compatível com Radxa Rock 5B / Orange Pi 5+ / Banana Pi M7).
+> **Software comercial completo** · landing page, autenticação, dashboard, editor, pricing, docs e API.
 
-Aplicação **single-file** — abre direto no navegador, sem build, sem `node_modules`.
+A primeira plataforma EDA construída para projetar placas com **modelos de IA destilados** rodando na borda. Suporte oficial para Rockchip RK3588, NVIDIA Jetson Orin, Google Coral, Hailo-8L e ESP32-S3.
 
 ![Stack](https://img.shields.io/badge/Three.js-0.160-5b8def)
-![Stack](https://img.shields.io/badge/Tailwind-CDN-2dd4bf)
-![Data](https://img.shields.io/badge/RKLLM-1.1.4-fbbf24)
+![Stack](https://img.shields.io/badge/RKLLM-1.1.4-fbbf24)
+![Plan](https://img.shields.io/badge/Free%20%E2%80%94-Pro%20R%24149-success)
 ![License](https://img.shields.io/badge/license-MIT-success)
+
+## Páginas do produto
+
+| Arquivo | Rota | Descrição |
+|---------|------|-----------|
+| `index.html` | `/` | Landing page comercial · hero, features, templates, pricing teaser, testimonials, CTA |
+| `login.html` | `/login` | Autenticação · Google/GitHub OAuth (mock) + email/senha · signup com plano selecionado |
+| `app.html` | `/app#/...` | Dashboard SPA · 7 rotas (overview, projects, templates, library, team, billing, settings) |
+| `editor.html` | `/editor` | Editor de placas · 6 modos de visualização + AI Copilot |
+| `pricing.html` | `/pricing` | Pricing comercial · toggle mensal/anual, tabela comparativa, FAQ |
+| `docs.html` | `/docs` | Documentação técnica · quickstart, plataformas, deployment, API, CLI |
+
+## Features comerciais
+
+### 🏠 Landing page (`index.html`)
+- Hero com produto rodando em iframe embed do editor
+- Features grid · 9 cartões
+- Templates preview · 6 placas
+- Marquee de empresas (Radxa, Orange Pi, Banana Pi, Seeed, Waveshare, PINE64, Armbian)
+- Stats numéricos animados
+- 3 testimonials com avatar gradient
+- Pricing teaser
+- Footer completo · 4 colunas
+
+### 🔐 Autenticação (`login.html`)
+- Split layout · brand storytelling + form
+- OAuth mock (Google + GitHub) com spinner
+- Email/senha com toggle signup/login
+- Persistence via `localStorage` (`assets/auth.js`)
+- Redirect via `?next=` após login
+- Plano pré-selecionado via `?plan=pro`
+
+### 📊 Dashboard SPA (`app.html`)
+Rotas hash-based:
+- **Overview** — Stats (projetos ativos, AI usage, colaboradores, plano), projetos recentes, activity feed do time
+- **Projetos** — Grid filtrado com busca em tempo real
+- **Templates** — 6 placas reais (RK3588, Jetson Orin, Coral, Hailo, ESP32-S3, Hailo-10H)
+- **Biblioteca de componentes** — Tabela com part numbers, fabricante, datasheets
+- **Time** — Lista de membros com roles e status online
+- **Faturamento** — Plano atual, histórico de faturas, método de pagamento, usage tracking
+- **Configurações** — Perfil, API keys, notificações, zona de perigo
+
+Mais: Sidebar com workspace + user menu, modal de criar projeto com seletor de template, Command Palette (`Ctrl+K`), toasts.
+
+### 💳 Pricing (`pricing.html`)
+- Toggle Mensal / Anual (−20%)
+- 3 cards · Free, Pro destacado (R$149/mês), Enterprise
+- Tabela comparativa com 6 seções (Projetos, AI Copilot, Simulação, Templates, Export, Time, Integração, Suporte)
+- FAQ com 8 perguntas (cancelamento, Pix, LGPD, JLCPCB, etc)
+
+### 📚 Documentação (`docs.html`)
+- Sidebar com 4 seções de navegação (24 links)
+- Quickstart de 5 minutos
+- Specs detalhadas de cada plataforma
+- Comandos copiáveis (RKLLM, Ollama, llama.cpp, MLC, ExecuTorch)
+- API REST com endpoints e exemplos curl
+- CLI `npcb` documentado
+
+### 🎮 Editor (`editor.html`)
+6 modos de visualização (2D/3D/X-Ray/Thermal/Signal/AI Inference) com:
+- 47 componentes reais com part numbers
+- 8 modelos LLM destilados com benchmarks RKLLM
+- 5 projetos de deployment
+- AI Copilot · Mini-mapa · Osciloscópio · Command palette
+
+## Estrutura
+
+```
+electronic-viewer/
+├── index.html         ← landing page comercial
+├── login.html         ← autenticação
+├── app.html           ← dashboard SPA (auth required)
+├── editor.html        ← editor de placas
+├── pricing.html       ← preços e planos
+├── docs.html          ← documentação
+├── assets/
+│   ├── styles.css     ← design system compartilhado
+│   ├── auth.js        ← session management
+│   └── data.js        ← templates, projetos, activity
+└── README.md
+```
 
 ## Como executar
 
 ```powershell
-# Opção 1 · abrir direto no navegador
+# Mais simples
 start index.html
 
-# Opção 2 · servidor local (recomendado)
+# Servidor local (recomendado — auth.js usa ES modules)
 npx serve .
-# acesse http://localhost:3000
+# http://localhost:3000
 
-# Opção 3 · Python
+# Ou Python
 python -m http.server 8000
-# acesse http://localhost:8000
 ```
-
-## Recursos
-
-### 6 modos de visualização
-- **2D Vector** — render SVG técnico com 47 componentes
-- **3D Realtime** — WebGL/Three.js fotorrealista com PBR materials
-- **X-Ray** — multicamadas translúcidas
-- **Thermal** — heatmap de TDP por componente
-- **Signal Flow** — animação de partículas pelas trilhas
-- **AI Inference** — visualização ao vivo do NPU rodando Qwen2.5
-
-### Hardware modelado (componentes reais com part number e datasheet)
-| Ref | Componente | Part Number | Fabricante |
-|-----|-----------|-------------|------------|
-| U1 | RK3588 SoC · 8-core · NPU 6 TOPS | `RK3588` | Rockchip |
-| U2 | LPDDR4X 8GB · 4266 Mbps | `H9HCNNNBKMMLXR-NEE` | SK hynix |
-| U3 | eMMC 5.1 64GB | `SDINBDG4-64G` | SanDisk |
-| U4 | PMIC · 3 buck + 4 LDO | `TPS65219RNQR` | Texas Instruments |
-| U5 | 2.5GbE PCIe controller | `RTL8125BG-CG` | Realtek |
-| U6 | Companion MCU Cortex-M0+ | `STM32G031K8T6` | STMicro |
-| U7 | USB-C PD 3.0 controller | `TUSB422RUKR` | TI |
-
-### 8 modelos destilados com benchmarks reais
-Medidos via [RKLLM v1.1.4](https://github.com/airockchip/rknn-llm) no RK3588 NPU @ max freq.
-
-| Modelo | Decode | Prefill | RAM | Ctx |
-|--------|--------|---------|-----|-----|
-| TinyLlama 1.1B Chat | 24.7 tok/s | 285 tok/s | 0.8 GB | 2K |
-| Llama 3.2 1B Instruct | 22.3 tok/s | 260 tok/s | 0.7 GB | 128K |
-| SmolLM2 1.7B Instruct | 17.4 tok/s | 205 tok/s | 1.2 GB | 8K |
-| Qwen2.5 1.5B Instruct | 16.5 tok/s | 195 tok/s | 1.0 GB | 32K |
-| DeepSeek-R1-Distill-Qwen-1.5B | 15.9 tok/s | 180 tok/s | 1.0 GB | 32K |
-| Gemma 2 2B Instruct | 14.2 tok/s | 165 tok/s | 1.4 GB | 8K |
-| Llama 3.2 3B Instruct | 11.8 tok/s | 110 tok/s | 2.1 GB | 128K |
-| Phi-3 Mini 4K Instruct | 10.6 tok/s | 95 tok/s | 2.4 GB | 4K |
-
-### 5 projetos de deployment integrados
-1. **[RKLLM Runtime](https://github.com/airockchip/rknn-llm)** — NPU acelerado · w4a16 (recomendado)
-2. **[Ollama](https://github.com/ollama/ollama)** — API OpenAI · GGUF Q4_K_M
-3. **[llama.cpp](https://github.com/ggerganov/llama.cpp)** — OpenCL Mali backend
-4. **[MLC-LLM](https://github.com/mlc-ai/mlc-llm)** — TVM cross-platform
-5. **[ExecuTorch](https://github.com/pytorch/executorch)** — PyTorch Edge · XNNPACK
-
-### Outras features
-- **AI Copilot** conversacional com conhecimento factual sobre RK3588 e modelos
-- **Osciloscópio virtual** ao clicar em qualquer trilha
-- **Mini-mapa** navegável
-- **Command palette** (`Ctrl+K`) estilo VSCode
-- **Métricas live**: tokens/s, potência (W), temperatura NPU, RAM
-- **28 barras** de atividade neural (camadas do Qwen2.5)
-- **Multi-cursor presence** (header colaborativo)
 
 ## Stack
 
-- HTML/CSS/JS puro · single-file
-- **Three.js 0.160** via ESM importmap (CDN jsdelivr)
-- **Tailwind CSS** via CDN JIT
+- **HTML/CSS/JS puro** · ES modules · zero bundle
+- **Three.js 0.160** via importmap (CDN jsdelivr)
 - **Inter + JetBrains Mono** (Google Fonts)
-- **WebGL 2.0** com OrbitControls e ACES Filmic Tone Mapping
-- SVG + Canvas 2D + WebGL coexistindo
+- **WebGL 2.0** com ACES Filmic Tone Mapping
+- **localStorage** para persistência (auth + projects)
+- **Hash routing** no dashboard SPA
 
-## Atalhos
+## Modelos de IA suportados
 
-| Tecla | Ação |
-|-------|------|
-| `Ctrl+K` | Command palette |
-| `2` | Vista 2D |
-| `3` | Vista 3D |
-| `X` | X-Ray |
-| `T` | Thermal |
-| `S` | Signal flow |
-| `Esc` | Fechar painéis |
-| Scroll | Zoom no cursor |
-| Arrastar | Pan |
+8 modelos destilados com benchmarks reais medidos via [RKLLM v1.1.4](https://github.com/airockchip/rknn-llm):
+
+| Modelo | Decode | Prefill | RAM | Ctx |
+|--------|--------|---------|-----|-----|
+| TinyLlama 1.1B | 24.7 tok/s | 285 | 0.8 GB | 2K |
+| Llama 3.2 1B | 22.3 tok/s | 260 | 0.7 GB | 128K |
+| Qwen2.5 1.5B | 16.5 tok/s | 195 | 1.0 GB | 32K |
+| DeepSeek-R1-Distill-1.5B | 15.9 tok/s | 180 | 1.0 GB | 32K |
+| Phi-3 Mini 4K | 10.6 tok/s | 95 | 2.4 GB | 4K |
+| Gemma 2 2B | 14.2 tok/s | 165 | 1.4 GB | 8K |
+
+## Plataformas suportadas
+
+- **Rockchip RK3588** — Radxa Rock 5B, Orange Pi 5+, Banana Pi M7
+- **NVIDIA Jetson Orin Nano** — 40 TOPS, 8GB LPDDR5
+- **Google Coral Edge TPU** — 4 TOPS INT8 ASIC
+- **Hailo-8L** — 13 TOPS · RPi 5 HAT
+- **ESP32-S3** — Whisper Tiny on-device
+- **Hailo-10H** (preview) — 40 TOPS dataflow
+
+## Roadmap
+
+- [x] Landing page comercial
+- [x] Autenticação OAuth + email
+- [x] Dashboard SPA com 7 rotas
+- [x] Editor de placas com 6 modos
+- [x] Pricing comercial
+- [x] Documentação técnica
+- [ ] Integração Stripe real para billing
+- [ ] Backend Node/Postgres para multi-usuário
+- [ ] API REST production-ready
+- [ ] CLI `npcb` npm package
+- [ ] WebSocket para colaboração real-time
 
 ## Licença
 
-MIT
+MIT · © 2026 NeuroPCB Tecnologia LTDA

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Entrar — NeuroPCB</title>
+<link rel="stylesheet" href="assets/styles.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 900px) { body { grid-template-columns: 1fr; } .aside { display: none; } }
+  .aside {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 30%, rgba(91, 141, 239, 0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 60% at 80% 80%, rgba(139, 92, 246, 0.12) 0%, transparent 60%),
+      var(--bg-1);
+    border-right: 1px solid var(--border);
+    padding: 48px; display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+  }
+  .aside::before {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(91, 141, 239, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(91, 141, 239, 0.06) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask: radial-gradient(ellipse 60% 50% at 50% 50%, black 0%, transparent 80%);
+    pointer-events: none;
+  }
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #5b8def, #8b5cf6, #2dd4bf);
+    border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 18px rgba(91,141,239,0.35);
+  }
+  .form-side { padding: 48px; display: flex; align-items: center; justify-content: center; }
+  .form-card { width: 100%; max-width: 380px; }
+  .oauth { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; border: 1px solid var(--border-l); border-radius: 8px; background: var(--bg-2); color: var(--text-1); width: 100%; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+  .oauth:hover { border-color: var(--accent); }
+  .divider-text { display: flex; align-items: center; gap: 12px; color: var(--text-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0; }
+  .divider-text::before, .divider-text::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+</style>
+</head>
+<body>
+
+<aside class="aside">
+  <a href="index.html" style="display: flex; align-items: center; gap: 10px; position: relative;">
+    <span class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.07 7.07 4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.07-7.07 4.24-4.24"/></svg>
+    </span>
+    <span style="font-weight: 700; font-size: 15px;">NeuroPCB</span>
+  </a>
+
+  <div style="margin: auto 0; position: relative;">
+    <h1 class="text-4xl font-bold" style="line-height: 1.15; margin-bottom: 16px;">
+      EDA para hardware<br/><span class="gradient-text">de IA na borda.</span>
+    </h1>
+    <p class="text-base text-muted" style="line-height: 1.6; max-width: 420px; margin-bottom: 32px;">
+      Projete, simule termicamente e faça deploy de modelos destilados em segundos.
+      Confiado por times em Radxa, Orange Pi e Seeed Studio.
+    </p>
+
+    <div style="display: flex; gap: 28px; flex-wrap: wrap;">
+      <div>
+        <div class="text-3xl font-bold gradient-text">8</div>
+        <div class="text-xs text-faint">modelos LLM</div>
+      </div>
+      <div>
+        <div class="text-3xl font-bold gradient-text">6</div>
+        <div class="text-xs text-faint">plataformas edge</div>
+      </div>
+      <div>
+        <div class="text-3xl font-bold gradient-text">47+</div>
+        <div class="text-xs text-faint">componentes reais</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 48px; padding: 20px; background: rgba(7, 8, 13, 0.5); border: 1px solid var(--border); border-radius: 12px; max-width: 420px;">
+      <p class="text-sm" style="margin: 0 0 12px; line-height: 1.5;">
+        <span style="color: var(--accent);">"</span>O AI Copilot sugeriu uma quantização que melhorou 18% nos tokens/s
+        do nosso Qwen2.5.<span style="color: var(--accent);">"</span>
+      </p>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #5b8def, #8b5cf6);"></div>
+        <div>
+          <div class="text-xs font-semibold">Mariana Ribeiro</div>
+          <div class="text-xs text-faint">Hardware Lead · EdgeAI Brasil</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-xs text-faint" style="position: relative;">© 2026 NeuroPCB Tecnologia LTDA</div>
+</aside>
+
+<main class="form-side">
+  <div class="form-card fade-up">
+    <h2 id="title" class="text-2xl font-bold" style="margin-bottom: 4px;">Entrar na sua conta</h2>
+    <p id="subtitle" class="text-sm text-muted" style="margin-bottom: 24px;">
+      Bem-vindo de volta. Entre para acessar seus projetos.
+    </p>
+
+    <button class="oauth" type="button" onclick="oauthLogin('Google')">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc04" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continuar com Google
+    </button>
+    <button class="oauth" type="button" onclick="oauthLogin('GitHub')" style="margin-top: 8px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58v-2.04c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.21.08 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.31 1.23a11.55 11.55 0 0 1 6.02 0c2.3-1.55 3.31-1.23 3.31-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      Continuar com GitHub
+    </button>
+
+    <div class="divider-text">ou com email</div>
+
+    <form id="auth-form" onsubmit="return submitForm(event)">
+      <div id="name-field" style="display: none; margin-bottom: 14px;">
+        <label class="text-xs text-muted" style="margin-bottom: 6px; display: block;">Nome</label>
+        <input type="text" id="name" placeholder="Seu nome"/>
+      </div>
+      <div style="margin-bottom: 14px;">
+        <label class="text-xs text-muted" style="margin-bottom: 6px; display: block;">Email</label>
+        <input type="email" id="email" placeholder="voce@empresa.com" required/>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <label class="text-xs text-muted">Senha</label>
+          <a class="text-xs text-accent" href="#" onclick="alert('Email de recuperação enviado (simulado)'); return false;">Esqueci a senha</a>
+        </div>
+        <input type="password" id="password" placeholder="••••••••" required minlength="6"/>
+      </div>
+      <div id="terms" style="display: none; margin-bottom: 16px;">
+        <label class="text-xs text-muted" style="display: flex; gap: 8px; align-items: flex-start;">
+          <input type="checkbox" id="terms-check" required style="margin-top: 2px; width: auto;"/>
+          <span>Concordo com os <a class="text-accent" href="#">Termos de uso</a> e <a class="text-accent" href="#">Política de privacidade</a></span>
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center;" id="submit-btn">
+        <span id="btn-label">Entrar</span>
+      </button>
+    </form>
+
+    <p id="toggle" class="text-sm text-muted" style="text-align: center; margin-top: 24px;">
+      Não tem conta? <a class="text-accent" href="#" onclick="switchMode(true); return false;">Criar grátis</a>
+    </p>
+
+    <p class="text-xs text-faint" style="text-align: center; margin-top: 24px;">
+      Protegido pela LGPD · <a class="text-faint" style="text-decoration: underline;" href="#">Termos</a> · <a class="text-faint" style="text-decoration: underline;" href="#">Privacidade</a>
+    </p>
+  </div>
+</main>
+
+<script type="module">
+import { signIn } from "./assets/auth.js";
+
+const params = new URLSearchParams(location.search);
+const isSignup = params.has("signup");
+const planParam = params.get("plan") || "free";
+const nextUrl = params.get("next") || "app.html";
+
+if (isSignup) switchMode(true);
+
+window.switchMode = function(signup) {
+  document.getElementById("title").textContent = signup ? "Criar sua conta" : "Entrar na sua conta";
+  document.getElementById("subtitle").textContent = signup
+    ? "Comece grátis. Sem cartão de crédito."
+    : "Bem-vindo de volta. Entre para acessar seus projetos.";
+  document.getElementById("name-field").style.display = signup ? "block" : "none";
+  document.getElementById("terms").style.display = signup ? "block" : "none";
+  document.getElementById("btn-label").textContent = signup ? "Criar conta grátis" : "Entrar";
+  document.getElementById("toggle").innerHTML = signup
+    ? `Já tem conta? <a class="text-accent" href="#" onclick="switchMode(false); return false;">Entrar</a>`
+    : `Não tem conta? <a class="text-accent" href="#" onclick="switchMode(true); return false;">Criar grátis</a>`;
+  history.replaceState(null, "", signup ? "login.html?signup=1" : "login.html");
+};
+
+window.oauthLogin = function(provider) {
+  const btn = event.currentTarget;
+  btn.innerHTML = `<div class="spinner"></div> Conectando ao ${provider}...`;
+  btn.disabled = true;
+  setTimeout(() => {
+    const fakeName = provider === "Google" ? "Você" : "Dev User";
+    const fakeEmail = provider === "Google" ? "voce@gmail.com" : "dev@github.local";
+    signIn({ email: fakeEmail, name: fakeName, plan: planParam });
+    location.href = decodeURIComponent(nextUrl);
+  }, 600);
+};
+
+window.submitForm = function(e) {
+  e.preventDefault();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const name = document.getElementById("name").value.trim();
+  const btn = document.getElementById("submit-btn");
+  btn.innerHTML = `<div class="spinner"></div>`;
+  btn.disabled = true;
+  setTimeout(() => {
+    signIn({ email, name: name || email.split("@")[0], plan: planParam });
+    location.href = decodeURIComponent(nextUrl);
+  }, 500);
+  return false;
+};
+</script>
+</body>
+</html>

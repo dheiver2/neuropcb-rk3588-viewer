@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Documentação — NeuroPCB</title>
+<link rel="stylesheet" href="assets/styles.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+  @media (max-width: 900px) { body { grid-template-columns: 1fr; } aside { display: none; } }
+  aside {
+    background: var(--bg-1); border-right: 1px solid var(--border);
+    padding: 16px 0;
+    max-height: 100vh; overflow-y: auto; position: sticky; top: 0;
+  }
+  aside .logo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 16px 16px; border-bottom: 1px solid var(--border); margin-bottom: 16px;
+  }
+  .logo-mark { width: 28px; height: 28px; background: linear-gradient(135deg, #5b8def, #8b5cf6, #2dd4bf); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; }
+
+  .docs-section { padding: 0 12px 16px; }
+  .docs-section-title {
+    padding: 6px 12px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-3); font-weight: 600;
+  }
+  .docs-link {
+    display: block; padding: 6px 12px; border-radius: 6px;
+    font-size: 13px; color: var(--text-2);
+  }
+  .docs-link:hover { background: var(--bg-2); color: var(--text-1); }
+  .docs-link.active { background: var(--bg-3); color: var(--accent); }
+
+  main { padding: 48px 56px; max-width: 920px; overflow-y: auto; max-height: 100vh; }
+
+  h1 { font-size: 36px; font-weight: 800; line-height: 1.2; margin: 0 0 16px; letter-spacing: -0.02em; }
+  h2 { font-size: 24px; font-weight: 700; line-height: 1.3; margin: 48px 0 16px; letter-spacing: -0.01em; }
+  h3 { font-size: 18px; font-weight: 600; margin: 32px 0 8px; }
+  p { line-height: 1.7; color: var(--text-2); margin: 12px 0; }
+  ul { line-height: 1.8; color: var(--text-2); padding-left: 24px; }
+  li { margin: 4px 0; }
+  a { color: var(--accent); }
+  a:hover { text-decoration: underline; }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 32px 0; }
+
+  code {
+    background: var(--bg-2); border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--accent-3);
+  }
+  pre {
+    background: #050810; border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px;
+    overflow-x: auto; margin: 16px 0;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    line-height: 1.6;
+    position: relative;
+  }
+  pre code { background: transparent; border: 0; padding: 0; color: #5fb3b3; }
+  pre .cmd { color: var(--success); }
+  pre .comment { color: var(--text-3); }
+  pre .str { color: var(--accent-3); }
+
+  .copy-btn {
+    position: absolute; top: 8px; right: 8px;
+    padding: 4px 8px; font-size: 10px;
+    background: var(--bg-3); border: 1px solid var(--border-l);
+    border-radius: 4px; color: var(--text-2); cursor: pointer;
+  }
+  .copy-btn:hover { color: var(--text-1); }
+
+  blockquote {
+    border-left: 3px solid var(--accent);
+    background: rgba(91, 141, 239, 0.06);
+    padding: 12px 16px; margin: 16px 0;
+    border-radius: 0 8px 8px 0;
+  }
+  blockquote p { margin: 0; color: var(--text-1); }
+
+  table.spec {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px; margin: 16px 0;
+    background: var(--bg-1); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  }
+  table.spec th, table.spec td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  table.spec th { background: var(--bg-2); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); }
+  table.spec tr:last-child td { border-bottom: 0; }
+
+  .toc {
+    position: sticky; top: 32px;
+    border-left: 1px solid var(--border);
+    padding-left: 20px; margin-left: 32px;
+    font-size: 12px;
+  }
+  .breadcrumb {
+    font-size: 12px; color: var(--text-3); margin-bottom: 16px;
+  }
+  .breadcrumb a { color: var(--text-3); }
+
+  .card-doc {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0;
+  }
+  .card-doc a {
+    background: var(--bg-1); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+    display: block; color: var(--text-1); text-decoration: none;
+    transition: all 0.15s;
+  }
+  .card-doc a:hover { border-color: var(--accent); transform: translateY(-1px); text-decoration: none; }
+  .card-doc strong { display: block; font-size: 14px; margin-bottom: 4px; }
+  .card-doc span { color: var(--text-3); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<aside>
+  <a href="index.html" class="logo">
+    <span class="logo-mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.07 7.07 4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.07-7.07 4.24-4.24"/></svg></span>
+    <div>
+      <div style="font-weight: 700; font-size: 14px;">NeuroPCB</div>
+      <div class="text-xs text-faint">Docs · v2.4</div>
+    </div>
+  </a>
+
+  <div class="docs-section">
+    <div class="docs-section-title">Começar</div>
+    <a class="docs-link active" href="#intro">Introdução</a>
+    <a class="docs-link" href="#quickstart">Quickstart · 5 min</a>
+    <a class="docs-link" href="#conceitos">Conceitos básicos</a>
+    <a class="docs-link" href="#interface">Tour pela interface</a>
+  </div>
+
+  <div class="docs-section">
+    <div class="docs-section-title">Plataformas</div>
+    <a class="docs-link" href="#rk3588">Rockchip RK3588</a>
+    <a class="docs-link" href="#jetson">NVIDIA Jetson Orin</a>
+    <a class="docs-link" href="#coral">Google Coral Edge TPU</a>
+    <a class="docs-link" href="#hailo">Hailo-8L</a>
+    <a class="docs-link" href="#esp32">ESP32-S3 Voice AI</a>
+  </div>
+
+  <div class="docs-section">
+    <div class="docs-section-title">Deployment</div>
+    <a class="docs-link" href="#rkllm">RKLLM Runtime</a>
+    <a class="docs-link" href="#ollama">Ollama</a>
+    <a class="docs-link" href="#llamacpp">llama.cpp</a>
+    <a class="docs-link" href="#mlc">MLC-LLM</a>
+    <a class="docs-link" href="#executorch">ExecuTorch</a>
+  </div>
+
+  <div class="docs-section">
+    <div class="docs-section-title">Modelos LLM</div>
+    <a class="docs-link" href="#tinyllama">TinyLlama 1.1B</a>
+    <a class="docs-link" href="#llama32">Llama 3.2 1B / 3B</a>
+    <a class="docs-link" href="#qwen25">Qwen2.5 1.5B</a>
+    <a class="docs-link" href="#deepseek">DeepSeek-R1-Distill</a>
+    <a class="docs-link" href="#phi3">Phi-3 Mini</a>
+    <a class="docs-link" href="#gemma2">Gemma 2 2B</a>
+  </div>
+
+  <div class="docs-section">
+    <div class="docs-section-title">API & SDK</div>
+    <a class="docs-link" href="#api">API REST</a>
+    <a class="docs-link" href="#webhooks">Webhooks</a>
+    <a class="docs-link" href="#cli">CLI npcb</a>
+  </div>
+</aside>
+
+<main>
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> · <a href="docs.html">Docs</a> · <span>Introdução</span>
+  </div>
+
+  <h1 id="intro">Documentação NeuroPCB</h1>
+  <p>NeuroPCB é a primeira plataforma EDA construída especificamente para projetar e fazer deploy de placas com modelos de IA destilados rodando na borda. Estas docs cobrem desde o quickstart até integração via API e SDK.</p>
+
+  <div class="card-doc">
+    <a href="#quickstart">
+      <strong>🚀 Quickstart · 5 min</strong>
+      <span>Crie seu primeiro projeto e faça deploy do Qwen2.5 em uma placa RK3588.</span>
+    </a>
+    <a href="#api">
+      <strong>🔌 API REST</strong>
+      <span>Integre NeuroPCB no seu CI/CD ou ferramentas internas.</span>
+    </a>
+    <a href="#rkllm">
+      <strong>⚡ Deploy via RKLLM</strong>
+      <span>Runtime oficial da Rockchip para LLMs no NPU.</span>
+    </a>
+    <a href="editor.html">
+      <strong>🎮 Demo ao vivo</strong>
+      <span>Veja a placa RK3588 sem precisar criar conta.</span>
+    </a>
+  </div>
+
+  <h2 id="quickstart">Quickstart · 5 minutos</h2>
+  <p>Em 5 minutos você vai ter um projeto criado, configurado com Qwen2.5-1.5B e comandos prontos para rodar em hardware real (Radxa Rock 5B / Orange Pi 5+).</p>
+
+  <h3>1 · Crie sua conta</h3>
+  <p>Acesse <a href="login.html?signup=1">login.html</a> e crie uma conta grátis com Google, GitHub ou email. Setup leva 30 segundos. Sem cartão de crédito.</p>
+
+  <h3>2 · Selecione um template</h3>
+  <p>No dashboard, clique em <strong>Novo projeto</strong> e escolha <strong>RK3588 Edge LLM Board</strong>. É a placa de referência baseada no chip Rockchip RK3588 (8-core ARM + NPU 6 TOPS).</p>
+
+  <h3>3 · Explore os 6 modos de visualização</h3>
+  <ul>
+    <li><strong>2D Vector</strong> — Layout SVG técnico</li>
+    <li><strong>3D Realtime</strong> — Render WebGL fotorrealista</li>
+    <li><strong>X-Ray</strong> — Multicamadas translúcidas</li>
+    <li><strong>Thermal</strong> — Heatmap baseado em TDP</li>
+    <li><strong>Signal Flow</strong> — Animação de corrente nas trilhas</li>
+    <li><strong>AI Inference</strong> — Visualizar tensors no NPU</li>
+  </ul>
+
+  <h3>4 · Selecione o modelo na sidebar</h3>
+  <p>Na aba <strong>Modelos IA</strong>, clique em <strong>Qwen2.5 1.5B Instruct</strong>. O painel direito mostra benchmarks reais medidos via RKLLM v1.1.4:</p>
+  <ul>
+    <li>Decode: 16.5 tok/s</li>
+    <li>Prefill: 195 tok/s</li>
+    <li>RAM: 1.0 GB</li>
+    <li>Contexto: 32K tokens</li>
+  </ul>
+
+  <h3>5 · Copie o comando de deploy</h3>
+  <p>Na aba <strong>Deploy</strong>, escolha <strong>RKLLM Runtime</strong> e copie os comandos. Cole no SSH da sua Radxa Rock 5B:</p>
+  <pre><code><span class="cmd">$</span> git clone https://github.com/airockchip/rknn-llm
+<span class="cmd">$</span> pip install rkllm-toolkit==1.1.4
+<span class="cmd">$</span> rkllm-convert --model Qwen/Qwen2.5-1.5B-Instruct \
+    --quantization w4a16 --platform rk3588 \
+    --output qwen25-1.5b.rkllm
+<span class="cmd">$</span> ./rkllm_server --model qwen25-1.5b.rkllm --port 8080</code><button class="copy-btn">Copiar</button></pre>
+
+  <p>Em 4 minutos você tem um servidor LLM rodando localmente, com API OpenAI-compatible em <code>localhost:8080</code>.</p>
+
+  <h2 id="conceitos">Conceitos básicos</h2>
+
+  <h3>Workspace</h3>
+  <p>Cada conta vem com um workspace. Workspace agrupa projetos, times e billing. No plano Free você tem 1 workspace; no Pro até 3; no Enterprise ilimitado.</p>
+
+  <h3>Projeto</h3>
+  <p>Um projeto representa uma placa eletrônica. Contém:</p>
+  <ul>
+    <li>Layout PCB (componentes, trilhas, layers)</li>
+    <li>BOM (Bill of Materials)</li>
+    <li>Configuração do modelo IA destilado</li>
+    <li>Comandos de deploy gerados</li>
+    <li>Histórico de versões</li>
+    <li>Comentários e revisões</li>
+  </ul>
+
+  <h3>Template</h3>
+  <p>Um template é um projeto pré-configurado de uma placa real (RK3588, Jetson Orin, Coral, Hailo, etc). Você pode forka-lo e personalizar.</p>
+
+  <h3>Modelo destilado</h3>
+  <p>Um modelo de IA quantizado e otimizado para rodar em hardware com recursos limitados. Exemplos suportados:</p>
+  <table class="spec">
+    <thead><tr><th>Modelo</th><th>Params</th><th>RAM</th><th>Decode @ RK3588</th></tr></thead>
+    <tbody>
+      <tr><td>TinyLlama 1.1B Chat</td><td>1.1B</td><td>0.8 GB</td><td>24.7 tok/s</td></tr>
+      <tr><td>Llama 3.2 1B Instruct</td><td>1.0B</td><td>0.7 GB</td><td>22.3 tok/s</td></tr>
+      <tr><td>Qwen2.5 1.5B Instruct</td><td>1.5B</td><td>1.0 GB</td><td>16.5 tok/s</td></tr>
+      <tr><td>DeepSeek-R1-Distill-Qwen-1.5B</td><td>1.5B</td><td>1.0 GB</td><td>15.9 tok/s</td></tr>
+      <tr><td>Phi-3 Mini 4K Instruct</td><td>3.8B</td><td>2.4 GB</td><td>10.6 tok/s</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="rk3588">Plataforma · Rockchip RK3588</h2>
+  <p>SoC octa-core fabricado em Samsung 8nm LP, com NPU dedicado de 6 TOPS. Plataforma open-source mais usada hoje para rodar LLMs destilados na borda.</p>
+
+  <table class="spec">
+    <tbody>
+      <tr><td><strong>CPU</strong></td><td>4×Cortex-A76 @2.4GHz + 4×Cortex-A55 @1.8GHz (big.LITTLE)</td></tr>
+      <tr><td><strong>NPU</strong></td><td>6 TOPS INT8 · 3 núcleos independentes</td></tr>
+      <tr><td><strong>GPU</strong></td><td>Mali-G610 MP4 @1GHz · Vulkan 1.2 · OpenCL 2.2</td></tr>
+      <tr><td><strong>RAM</strong></td><td>LPDDR4/LPDDR4X até 32GB</td></tr>
+      <tr><td><strong>TDP</strong></td><td>~12W pico (recomendado heatsink + fan)</td></tr>
+      <tr><td><strong>Placas compat.</strong></td><td>Radxa Rock 5B, Orange Pi 5+, Banana Pi M7, Khadas Edge2</td></tr>
+    </tbody>
+  </table>
+
+  <blockquote><p><strong>📌 Dica:</strong> Use o template <strong>RK3588 Edge LLM Board</strong> para começar. Já vem com layout PCB, BOM e 8 modelos LLM pré-configurados.</p></blockquote>
+
+  <h2 id="rkllm">Deployment · RKLLM Runtime</h2>
+  <p>Runtime oficial da Rockchip para inferência de LLMs no NPU. Aceita modelos Qwen, Llama, Phi-3, DeepSeek, Gemma, ChatGLM, InternLM, Mistral.</p>
+
+  <h3>Instalação</h3>
+  <pre><code><span class="cmd">$</span> git clone https://github.com/airockchip/rknn-llm
+<span class="cmd">$</span> cd rknn-llm
+<span class="cmd">$</span> pip install rkllm-toolkit/packages/rkllm_toolkit-1.1.4-cp310-cp310-linux_x86_64.whl</code><button class="copy-btn">Copiar</button></pre>
+
+  <h3>Quantização</h3>
+  <p>Converte modelo HuggingFace para formato <code>.rkllm</code> com quantização W4A16 (pesos INT4, ativações FP16):</p>
+  <pre><code><span class="cmd">$</span> rkllm-convert \
+    --model Qwen/Qwen2.5-1.5B-Instruct \
+    --quantization w4a16 \
+    --platform rk3588 \
+    --output qwen25-1.5b.rkllm</code><button class="copy-btn">Copiar</button></pre>
+
+  <h3>Servir</h3>
+  <pre><code><span class="cmd">$</span> ./rkllm_server \
+    --model qwen25-1.5b.rkllm \
+    --port 8080 \
+    --max-ctx 4096</code><button class="copy-btn">Copiar</button></pre>
+
+  <h3>Cliente</h3>
+  <pre><code><span class="cmd">$</span> curl http://localhost:8080/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+      "model": "qwen",
+      "messages": [{"role": "user", "content": "Olá!"}]
+    }'</code><button class="copy-btn">Copiar</button></pre>
+
+  <p>Repositório: <a href="https://github.com/airockchip/rknn-llm">github.com/airockchip/rknn-llm</a></p>
+
+  <h2 id="ollama">Deployment · Ollama</h2>
+  <p>Servidor LLM com auto-quantização GGUF. Roda em CPU + Mali GPU no RK3588 (sem NPU). Mais lento que RKLLM, mas com catálogo enorme e API OpenAI-compatible pronta.</p>
+
+  <pre><code><span class="cmd">$</span> curl -fsSL https://ollama.com/install.sh | sh
+<span class="cmd">$</span> ollama pull qwen2.5:1.5b-instruct-q4_K_M
+<span class="cmd">$</span> ollama serve  <span class="comment"># API em :11434</span>
+<span class="cmd">$</span> ollama run qwen2.5:1.5b "Olá!"</code><button class="copy-btn">Copiar</button></pre>
+
+  <p>Performance esperada no RK3588 (sem NPU): <strong>6-8 tok/s</strong> para Qwen2.5 1.5B.</p>
+
+  <h2 id="api">API REST</h2>
+  <p>A API NeuroPCB permite gerenciar projetos, exportar Gerber, rodar simulações e integrar no seu CI/CD. Disponível nos planos <strong>Pro</strong> (100 req/min) e <strong>Enterprise</strong> (ilimitado).</p>
+
+  <h3>Autenticação</h3>
+  <p>Todas as requisições usam Bearer token. Gere chaves em <a href="app.html#/settings">Settings → API Keys</a>.</p>
+  <pre><code><span class="cmd">$</span> curl https://api.neuropcb.io/v1/projects \
+    -H "Authorization: Bearer npcb_live_•••••••"</code><button class="copy-btn">Copiar</button></pre>
+
+  <h3>Endpoints</h3>
+  <table class="spec">
+    <thead><tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr></thead>
+    <tbody>
+      <tr><td><code>GET</code></td><td><code>/v1/projects</code></td><td>Listar todos os projetos</td></tr>
+      <tr><td><code>POST</code></td><td><code>/v1/projects</code></td><td>Criar projeto a partir de template</td></tr>
+      <tr><td><code>GET</code></td><td><code>/v1/projects/:id</code></td><td>Detalhes do projeto</td></tr>
+      <tr><td><code>POST</code></td><td><code>/v1/projects/:id/export</code></td><td>Exportar Gerber/BOM/PDF</td></tr>
+      <tr><td><code>POST</code></td><td><code>/v1/projects/:id/simulate</code></td><td>Rodar simulação térmica</td></tr>
+      <tr><td><code>POST</code></td><td><code>/v1/copilot/ask</code></td><td>Perguntar ao AI Copilot</td></tr>
+      <tr><td><code>GET</code></td><td><code>/v1/templates</code></td><td>Listar templates disponíveis</td></tr>
+      <tr><td><code>GET</code></td><td><code>/v1/models</code></td><td>Listar modelos LLM com benchmarks</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Exemplo · criar projeto</h3>
+  <pre><code><span class="cmd">$</span> curl https://api.neuropcb.io/v1/projects \
+    -H "Authorization: Bearer npcb_live_•••••••" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "Voice Assistant V2",
+      "template": "tpl-rk3588",
+      "tags": ["voice", "edge", "qwen"]
+    }'</code><button class="copy-btn">Copiar</button></pre>
+
+  <h2 id="cli">CLI · npcb</h2>
+  <p>O CLI <code>npcb</code> permite gerenciar projetos do terminal, ideal para CI/CD e automação.</p>
+
+  <pre><code><span class="cmd">$</span> npm install -g @neuropcb/cli
+<span class="cmd">$</span> npcb login
+<span class="cmd">$</span> npcb new my-board --template rk3588
+<span class="cmd">$</span> npcb export gerber --output ./fab
+<span class="cmd">$</span> npcb deploy --target radxa-rock-5b@192.168.1.10</code><button class="copy-btn">Copiar</button></pre>
+
+  <hr/>
+
+  <p class="text-sm text-faint" style="text-align: center; padding: 32px 0;">
+    Não encontrou o que procurava? <a href="mailto:help@neuropcb.io">help@neuropcb.io</a> ·
+    <a href="https://github.com/dheiver2/neuropcb-rk3588-viewer">GitHub</a> ·
+    <a href="#">Discord</a>
+  </p>
+</main>
+
+<script>
+  // Smooth scroll for anchor links
+  document.querySelectorAll(".docs-link[href^='#']").forEach(a => {
+    a.addEventListener("click", e => {
+      e.preventDefault();
+      document.querySelectorAll(".docs-link").forEach(x => x.classList.remove("active"));
+      a.classList.add("active");
+      const el = document.querySelector(a.getAttribute("href"));
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+  // Copy buttons
+  document.querySelectorAll(".copy-btn").forEach(b => {
+    b.addEventListener("click", e => {
+      const code = b.parentElement.querySelector("code").innerText;
+      navigator.clipboard?.writeText(code);
+      b.textContent = "Copiado!";
+      setTimeout(() => b.textContent = "Copiar", 1500);
+    });
+  });
+</script>
+</body>
+</html>
