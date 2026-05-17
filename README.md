@@ -2,9 +2,27 @@
 
 Visualizador web profissional de projetos eletrônicos com foco em placas para **modelos de IA destilados** rodando na borda. Plataforma de referência: **Rockchip RK3588** (compatível com Radxa Rock 5B / Orange Pi 5+ / Banana Pi M7).
 
-![Tech](https://img.shields.io/badge/Three.js-WebGL_2.0-5b8def)
-![Tech](https://img.shields.io/badge/RKLLM-1.1.4-fbbf24)
+Aplicação **single-file** — abre direto no navegador, sem build, sem `node_modules`.
+
+![Stack](https://img.shields.io/badge/Three.js-0.160-5b8def)
+![Stack](https://img.shields.io/badge/Tailwind-CDN-2dd4bf)
+![Data](https://img.shields.io/badge/RKLLM-1.1.4-fbbf24)
 ![License](https://img.shields.io/badge/license-MIT-success)
+
+## Como executar
+
+```powershell
+# Opção 1 · abrir direto no navegador
+start index.html
+
+# Opção 2 · servidor local (recomendado)
+npx serve .
+# acesse http://localhost:3000
+
+# Opção 3 · Python
+python -m http.server 8000
+# acesse http://localhost:8000
+```
 
 ## Recursos
 
@@ -16,7 +34,7 @@ Visualizador web profissional de projetos eletrônicos com foco em placas para *
 - **Signal Flow** — animação de partículas pelas trilhas
 - **AI Inference** — visualização ao vivo do NPU rodando Qwen2.5
 
-### Hardware modelado (componentes reais)
+### Hardware modelado (componentes reais com part number e datasheet)
 | Ref | Componente | Part Number | Fabricante |
 |-----|-----------|-------------|------------|
 | U1 | RK3588 SoC · 8-core · NPU 6 TOPS | `RK3588` | Rockchip |
@@ -42,7 +60,7 @@ Medidos via [RKLLM v1.1.4](https://github.com/airockchip/rknn-llm) no RK3588 NPU
 | Phi-3 Mini 4K Instruct | 10.6 tok/s | 95 tok/s | 2.4 GB | 4K |
 
 ### 5 projetos de deployment integrados
-1. **[RKLLM Runtime](https://github.com/airockchip/rknn-llm)** — NPU acelerado · w4a16
+1. **[RKLLM Runtime](https://github.com/airockchip/rknn-llm)** — NPU acelerado · w4a16 (recomendado)
 2. **[Ollama](https://github.com/ollama/ollama)** — API OpenAI · GGUF Q4_K_M
 3. **[llama.cpp](https://github.com/ggerganov/llama.cpp)** — OpenCL Mali backend
 4. **[MLC-LLM](https://github.com/mlc-ai/mlc-llm)** — TVM cross-platform
@@ -57,42 +75,20 @@ Medidos via [RKLLM v1.1.4](https://github.com/airockchip/rknn-llm) no RK3588 NPU
 - **28 barras** de atividade neural (camadas do Qwen2.5)
 - **Multi-cursor presence** (header colaborativo)
 
-## Uso rápido
-
-### Preview standalone (sem build)
-Abra `public/index.html` diretamente no navegador. Standalone, usa CDNs:
-- Tailwind via JIT CDN
-- Three.js 0.160 via importmap
-
-### Versão React/TypeScript (Vite)
-```bash
-npm install
-npm run dev
-```
-
-Estrutura `src/`:
-- `components/board/BoardCanvas.tsx` — canvas SVG via react-konva
-- `components/chip/ChipDetail.tsx` — painel do componente
-- `components/ui/Toolbar.tsx` · `ModelList.tsx`
-- `store/viewer.ts` — estado global (zustand)
-- `types/index.ts` — Board, Pin, DistilledModel, etc.
-- `data/boards/example-board.ts`
-- `data/models/distilled-models.ts`
-
 ## Stack
 
-- **React 18** + **TypeScript 5.4**
-- **Vite 5** + **Tailwind 3.4**
-- **Three.js 0.160** com OrbitControls e ACES Filmic Tone Mapping
-- **react-konva 18** (canvas 2D)
-- **Zustand 4** (state)
+- HTML/CSS/JS puro · single-file
+- **Three.js 0.160** via ESM importmap (CDN jsdelivr)
+- **Tailwind CSS** via CDN JIT
+- **Inter + JetBrains Mono** (Google Fonts)
+- **WebGL 2.0** com OrbitControls e ACES Filmic Tone Mapping
+- SVG + Canvas 2D + WebGL coexistindo
 
 ## Atalhos
 
 | Tecla | Ação |
 |-------|------|
 | `Ctrl+K` | Command palette |
-| `1`-`6` | Trocar modo de visualização |
 | `2` | Vista 2D |
 | `3` | Vista 3D |
 | `X` | X-Ray |
