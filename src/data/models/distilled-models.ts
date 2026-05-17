@@ -1,0 +1,43 @@
+import type { DistilledModel } from "../../types";
+
+export const distilledModels: DistilledModel[] = [
+  {
+    id: "model-phi3-mini-int8",
+    name: "Phi-3 Mini INT8",
+    baseModel: "microsoft/phi-3-mini-4k-instruct",
+    parameters: "3.8B",
+    quantization: "INT8",
+    targetChip: "NPU-3080",
+    memoryRequirement: "3.8GB",
+    powerConsumption: "2.1W",
+    inferenceSpeed: "45 tok/s",
+    boardId: "board-distilled-001",
+    tags: ["llm", "edge", "int8", "microsoft"],
+  },
+  {
+    id: "model-tinyllama-int4",
+    name: "TinyLlama INT4",
+    baseModel: "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    parameters: "1.1B",
+    quantization: "INT4",
+    targetChip: "NPU-3080",
+    memoryRequirement: "0.6GB",
+    powerConsumption: "0.8W",
+    inferenceSpeed: "120 tok/s",
+    boardId: "board-distilled-001",
+    tags: ["llm", "edge", "int4", "ultra-compact"],
+  },
+  {
+    id: "model-mobileclip-fp16",
+    name: "MobileCLIP FP16",
+    baseModel: "apple/MobileCLIP-S2",
+    parameters: "35M",
+    quantization: "FP16",
+    targetChip: "NPU-3080",
+    memoryRequirement: "70MB",
+    powerConsumption: "0.3W",
+    inferenceSpeed: "200 img/s",
+    boardId: "board-distilled-001",
+    tags: ["vision", "clip", "multimodal", "apple"],
+  },
+];
