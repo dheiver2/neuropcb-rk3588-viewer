@@ -123,8 +123,8 @@
 </head>
 <body>
 
-<!-- ============ NAV ============ -->
-<nav class="main">
+<!-- ============ NAV (public) ============ -->
+<nav class="main" id="nav-public">
   <div class="container" style="display: flex; align-items: center; padding-top: 14px; padding-bottom: 14px;">
     <a href="index.html" style="display: flex; align-items: center; gap: 10px;">
       <span class="logo-mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.07 7.07 4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.07-7.07 4.24-4.24"/></svg></span>
@@ -143,6 +143,48 @@
     </div>
   </div>
 </nav>
+
+<!-- ============ NAV (in-app · shown when ?from=app) ============ -->
+<nav class="main" id="nav-app" style="display: none;">
+  <div class="container" style="display: flex; align-items: center; padding-top: 12px; padding-bottom: 12px;">
+    <a href="app.html" class="btn btn-ghost" style="font-size: 13px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Dashboard
+    </a>
+    <span style="margin: 0 12px; color: var(--text-3);">/</span>
+    <a href="app.html#/projects" class="text-sm text-muted">Projetos</a>
+    <span style="margin: 0 8px; color: var(--text-3);">/</span>
+    <span class="text-sm" style="font-weight: 600;">VESPER rev-A · NEURION X1</span>
+    <span class="badge" style="background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white; margin-left: 10px;">⚛️ FLAGSHIP</span>
+
+    <div style="margin-left: auto; display: flex; gap: 8px; align-items: center;">
+      <span class="text-xs text-faint mono">Auto-saved · há 8 min</span>
+      <button class="btn btn-sm" onclick="window.toast('🔗 Link copiado para área de transferência')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Compartilhar
+      </button>
+      <button class="btn btn-sm" onclick="document.querySelector('#export-all').scrollIntoView({behavior:'smooth'})">📦 Export</button>
+      <div style="display: flex; align-items: center; gap: 6px; margin-left: 8px;">
+        <div style="display: flex; margin-right: -8px;">
+          <div style="width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #f472b6, #a855f7); border: 2px solid var(--bg-0);" title="Mariana R."></div>
+          <div style="width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #34d399, #2dd4bf); border: 2px solid var(--bg-0); margin-left: -8px;" title="Pedro L."></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+// Detect app context — switch nav if accessed from dashboard
+(function() {
+  const fromApp = new URLSearchParams(location.search).get("from") === "app";
+  const session = (() => { try { return JSON.parse(localStorage.getItem("neuropcb_session")); } catch { return null; } })();
+  if (fromApp || session) {
+    document.getElementById("nav-app").style.display = "block";
+    document.getElementById("nav-public").style.display = "none";
+  }
+})();
+</script>
 
 <!-- ============ HERO ============ -->
 <section class="hero-chip">

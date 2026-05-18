@@ -369,8 +369,10 @@ function renderOverview() {
 
 function projectCard(p) {
   const template = TEMPLATES.find(t => t.id === p.template);
+  const isFlagship = p.flagship || template?.flagship;
   return `
-    <div class="card project-card" style="padding: 14px; position: relative;" onclick="openProject('${p.id}')">
+    <div class="card project-card" style="padding: 14px; position: relative; ${isFlagship ? 'border-color: rgba(139, 92, 246, 0.5); box-shadow: 0 0 24px rgba(91, 141, 239, 0.1);' : ''}" onclick="openProject('${p.id}')">
+      ${isFlagship ? `<div style="position: absolute; top: 8px; right: 8px; z-index: 2; background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white; padding: 3px 8px; border-radius: 999px; font-size: 9px; font-weight: 700; box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);">⚛️ FLAGSHIP</div>` : ''}
       <div class="project-thumb" style="background: ${template?.color || 'var(--bg-2)'}; margin-bottom: 12px;">
         ${p.thumbnail || template?.icon || "📦"}
       </div>
@@ -430,7 +432,8 @@ function renderTemplates() {
     </div>
     <div class="grid-cards" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));">
       ${TEMPLATES.map(t => `
-        <div class="card project-card" style="overflow: hidden;" onclick="openNewProjectWithTemplate('${t.id}')">
+        <div class="card project-card" style="overflow: hidden; position: relative; ${t.flagship ? 'border: 1px solid rgba(139, 92, 246, 0.5); box-shadow: 0 0 32px rgba(91, 141, 239, 0.15);' : ''}" onclick="${t.flagship ? `location.href='${t.customPage}?from=app&template=${t.id}'` : `openNewProjectWithTemplate('${t.id}')`}">
+          ${t.flagship ? `<div style="position: absolute; top: 10px; right: 10px; z-index: 2; background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white; padding: 4px 10px; border-radius: 999px; font-size: 9px; font-weight: 700; box-shadow: 0 0 16px rgba(139, 92, 246, 0.6);">⚛️ FLAGSHIP</div>` : ''}
           <div class="project-thumb" style="background: ${t.color}; aspect-ratio: 16/8; border-radius: 0; font-size: 64px;">${t.icon}</div>
           <div style="padding: 16px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
@@ -447,6 +450,7 @@ function renderTemplates() {
               <div>🔀 ${t.layers} layers</div>
             </div>
             <div class="text-xs mono" style="color: var(--success);">${t.benchmark}</div>
+            ${t.flagship ? `<div class="text-xs mono" style="margin-top: 8px; color: var(--accent); display: flex; align-items: center; gap: 4px;">⚛️ Chip exclusivo NeuroPCB · com simulador e export</div>` : ''}
           </div>
         </div>
       `).join("")}
@@ -701,7 +705,15 @@ window.createProjectAction = function() {
 };
 
 window.openProject = function(id) {
-  location.href = `editor.html?project=${id}`;
+  const project = getProject(id);
+  if (!project) { location.href = `editor.html?project=${id}`; return; }
+  const tpl = TEMPLATES.find(t => t.id === project.template);
+  // If template defines a custom page (e.g. flagship NEURION X1), open that
+  if (tpl?.customPage) {
+    location.href = `${tpl.customPage}?from=app&project=${id}`;
+  } else {
+    location.href = `editor.html?project=${id}`;
+  }
 };
 
 // ============ COMMAND PALETTE ============

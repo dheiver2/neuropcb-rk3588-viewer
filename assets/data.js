@@ -5,6 +5,25 @@ const PROJECTS_KEY = "neuropcb_projects";
 
 export const TEMPLATES = [
   {
+    id: "tpl-neurion-x1",
+    name: "VESPER · NEURION X1 Reference",
+    desc: "Chip CIM custom da NeuroPCB · 32 TOPS @ 0.5W · primeiro NPU do mundo desenhado do zero para LLMs destilados",
+    chip: "NEURION X1",
+    chipType: "Compute-in-Memory NPU",
+    compat: ["VESPER rev-A DevKit"],
+    tops: 32,
+    ram: "128 MB SRAM on-die + 4 GB HBM2e",
+    models: ["Qwen2.5 1.5B (180 tok/s)", "Llama 3.2 1B (240 tok/s)", "Phi-3 Mini (95 tok/s)", "DeepSeek-R1-Distill (165 tok/s)"],
+    tier: "enterprise",
+    flagship: true,
+    customPage: "chip-neurion.html",
+    color: "linear-gradient(135deg, #5b8def, #8b5cf6, #2dd4bf)",
+    icon: "⚛️",
+    components: 142,
+    layers: 6,
+    benchmark: "180 tok/s · Qwen2.5-1.5B · 0.5W"
+  },
+  {
     id: "tpl-rk3588",
     name: "RK3588 Edge LLM Board",
     desc: "Placa de referência para LLMs destilados · NPU 6 TOPS · 8 GB LPDDR4X",
@@ -114,6 +133,21 @@ export function seedProjects(session) {
   if (existing.length > 0) return;
   const now = Date.now();
   const seed = [
+    {
+      id: "prj_neurion_vesper",
+      name: "VESPER rev-A · NEURION X1 DevBoard",
+      template: "tpl-neurion-x1",
+      desc: "Carrier board para o chip NEURION X1 · pronto para fabricação",
+      tags: ["flagship", "cim", "novel-chip", "manufacturing-ready"],
+      status: "active",
+      updatedAt: now - 1000 * 60 * 8,
+      createdAt: now - 1000 * 60 * 60 * 24 * 1,
+      thumbnail: "⚛️",
+      collaborators: [session.name, "Mariana R.", "Pedro L."],
+      pages: 6, components: 142,
+      flagship: true,
+      customPage: "chip-neurion.html"
+    },
     {
       id: "prj_" + Math.random().toString(36).slice(2, 10),
       name: "Voice Assistant MVP",
