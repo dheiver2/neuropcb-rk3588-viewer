@@ -144,39 +144,98 @@
   </div>
 </nav>
 
-<!-- ============ NAV (in-app · shown when ?from=app) ============ -->
-<nav class="main" id="nav-app" style="display: none;">
-  <div class="container" style="display: flex; align-items: center; padding-top: 12px; padding-bottom: 12px;">
-    <a href="app.html" class="btn btn-ghost" style="font-size: 13px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-      Dashboard
+<!-- ============ APP SHELL (in-app · shown when ?from=app or session exists) ============ -->
+<div id="nav-app" style="display: none;">
+  <!-- Row 1: breadcrumb + actions -->
+  <header style="height: 44px; display: flex; align-items: center; padding: 0 12px; background: rgba(7,8,13,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50;">
+    <a href="app.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+      <div style="width: 24px; height: 24px; border-radius: 6px; background: linear-gradient(135deg, #5b8def, #8b5cf6, #2dd4bf); display: inline-flex; align-items: center; justify-content: center;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.07 7.07 4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.07-7.07 4.24-4.24"/></svg>
+      </div>
+      <span style="font-weight: 700; font-size: 13px;" class="gradient-text">NeuroPCB</span>
     </a>
-    <span style="margin: 0 12px; color: var(--text-3);">/</span>
-    <a href="app.html#/projects" class="text-sm text-muted">Projetos</a>
-    <span style="margin: 0 8px; color: var(--text-3);">/</span>
-    <span class="text-sm" style="font-weight: 600;">VESPER rev-A · NEURION X1</span>
-    <span class="badge" style="background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white; margin-left: 10px;">⚛️ FLAGSHIP</span>
 
-    <div style="margin-left: auto; display: flex; gap: 8px; align-items: center;">
-      <span class="text-xs text-faint mono">Auto-saved · há 8 min</span>
-      <a class="btn btn-sm btn-primary" href="editor.html?board=vesper-neurion-x1&from=app" style="background: linear-gradient(135deg, #8b5cf6, #5b8def);">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg>
-        Abrir no Editor PCB →
-      </a>
-      <button class="btn btn-sm" onclick="window.toast('🔗 Link copiado para área de transferência')">
+    <!-- Breadcrumb -->
+    <div style="display: flex; align-items: center; gap: 6px; margin-left: 12px; font-size: 12px; color: var(--text-3);">
+      <span>/</span>
+      <a href="app.html#/projects" style="color: var(--text-3); text-decoration: none; padding: 4px 6px; border-radius: 4px;" onmouseover="this.style.background='var(--bg-2)'; this.style.color='var(--text-1)'" onmouseout="this.style.background=''; this.style.color='var(--text-3)'">Projetos</a>
+      <span>/</span>
+      <span style="font-weight: 500; color: var(--text-1);">VESPER rev-A · NEURION X1</span>
+      <span class="badge" style="background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white; margin-left: 6px;">⚛️ FLAGSHIP</span>
+    </div>
+
+    <!-- Right actions -->
+    <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
+      <span style="font-size: 11px; color: var(--text-3); font-family: 'JetBrains Mono', monospace;">
+        <span class="pulse-dot" style="display: inline-block; width: 4px; height: 4px; margin-right: 4px; vertical-align: middle;"></span>
+        Auto-saved há 8 min
+      </span>
+      <span style="width: 1px; height: 20px; background: var(--border);"></span>
+      <button class="btn btn-sm" onclick="window.toast('🔗 Link copiado')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         Compartilhar
       </button>
-      <button class="btn btn-sm" onclick="document.querySelector('#export-all').scrollIntoView({behavior:'smooth'})">📦 Export</button>
-      <div style="display: flex; align-items: center; gap: 6px; margin-left: 8px;">
-        <div style="display: flex; margin-right: -8px;">
-          <div style="width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #f472b6, #a855f7); border: 2px solid var(--bg-0);" title="Mariana R."></div>
-          <div style="width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #34d399, #2dd4bf); border: 2px solid var(--bg-0); margin-left: -8px;" title="Pedro L."></div>
-        </div>
+      <div style="display: flex; margin: 0 4px;">
+        <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #f472b6, #a855f7); border: 2px solid var(--bg-0);" title="Mariana R."></div>
+        <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #34d399, #2dd4bf); border: 2px solid var(--bg-0); margin-left: -8px;" title="Pedro L."></div>
       </div>
+      <button class="btn btn-sm btn-primary" onclick="window.toast('🚀 Publicado para o time')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Publicar
+      </button>
     </div>
+  </header>
+
+  <!-- Row 2: project tabs -->
+  <div style="height: 36px; display: flex; align-items: center; padding: 0 8px; background: var(--bg-1); border-bottom: 1px solid var(--border); position: sticky; top: 44px; z-index: 49;">
+    <a class="proj-tab active" href="javascript:void(0)" onclick="scrollSection('top')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      Overview
+    </a>
+    <a class="proj-tab" href="editor.html?board=vesper-neurion-x1&from=app">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+      Layout PCB
+    </a>
+    <a class="proj-tab" href="javascript:void(0)" onclick="scrollSection('sim-canvas')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Simular
+    </a>
+    <a class="proj-tab" href="javascript:void(0)" onclick="scrollSection('export-all')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exportar
+    </a>
+    <a class="proj-tab" href="editor.html?board=vesper-neurion-x1&from=app&tab=bom">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      BOM
+    </a>
+    <a class="proj-tab" href="javascript:void(0)" onclick="window.toast && window.toast('Em breve: timeline de atividade')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Atividade
+    </a>
   </div>
-</nav>
+</div>
+
+<style>
+  .proj-tab {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 12px; font-size: 12px; font-weight: 500;
+    color: var(--text-2); border-bottom: 2px solid transparent;
+    cursor: pointer; transition: all 0.15s;
+    margin-bottom: -1px; text-decoration: none;
+  }
+  .proj-tab:hover { color: var(--text-1); }
+  .proj-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+</style>
+
+<script>
+  function scrollSection(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelectorAll('.proj-tab').forEach(t => t.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+  }
+  window.scrollSection = scrollSection;
+</script>
 
 <script>
 // Detect app context — switch nav if accessed from dashboard

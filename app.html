@@ -432,7 +432,7 @@ function renderTemplates() {
     </div>
     <div class="grid-cards" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));">
       ${TEMPLATES.map(t => `
-        <div class="card project-card" style="overflow: hidden; position: relative; ${t.flagship ? 'border: 1px solid rgba(139, 92, 246, 0.5); box-shadow: 0 0 32px rgba(91, 141, 239, 0.15);' : ''}" onclick="${t.flagship ? `location.href='${t.customPage}?from=app&template=${t.id}'` : `openNewProjectWithTemplate('${t.id}')`}">
+        <div class="card project-card" style="overflow: hidden; position: relative; ${t.flagship ? 'border: 1px solid rgba(139, 92, 246, 0.5); box-shadow: 0 0 32px rgba(91, 141, 239, 0.15);' : ''}" onclick="openNewProjectWithTemplate('${t.id}')">
           ${t.flagship ? `<div style="position: absolute; top: 10px; right: 10px; z-index: 2; background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white; padding: 4px 10px; border-radius: 999px; font-size: 9px; font-weight: 700; box-shadow: 0 0 16px rgba(139, 92, 246, 0.6);">⚛️ FLAGSHIP</div>` : ''}
           <div class="project-thumb" style="background: ${t.color}; aspect-ratio: 16/8; border-radius: 0; font-size: 64px;">${t.icon}</div>
           <div style="padding: 16px;">
@@ -708,12 +708,10 @@ window.openProject = function(id) {
   const project = getProject(id);
   if (!project) { location.href = `editor.html?project=${id}`; return; }
   const tpl = TEMPLATES.find(t => t.id === project.template);
-  // If template defines a custom page (e.g. flagship NEURION X1), open that
-  if (tpl?.customPage) {
-    location.href = `${tpl.customPage}?from=app&project=${id}`;
-  } else {
-    location.href = `editor.html?project=${id}`;
-  }
+  // Market standard: always open the editor (Layout view) first.
+  // Other tabs (Overview, Simulate, Export) are accessible via project tabs in-editor.
+  const board = tpl?.id === 'tpl-neurion-x1' ? 'vesper-neurion-x1' : 'rk3588';
+  location.href = `editor.html?project=${id}&board=${board}&from=app`;
 };
 
 // ============ COMMAND PALETTE ============

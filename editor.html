@@ -230,78 +230,174 @@
 
 <div class="flex h-screen flex-col">
 
-  <!-- ==================== HEADER ==================== -->
-  <header class="h-12 flex items-center px-3 glass border-x-0 border-t-0 z-30">
-    <div class="flex items-center gap-2 min-w-0">
-      <div class="relative w-7 h-7 rounded-lg flex items-center justify-center"
-           style="background: linear-gradient(135deg, #5b8def, #8b5cf6, #2dd4bf); box-shadow: 0 0 16px rgba(91,141,239,0.4);">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+  <!-- ==================== APP SHELL HEADER (row 1: breadcrumb + actions) ==================== -->
+  <header class="h-11 flex items-center px-3 glass border-x-0 border-t-0 z-30" style="border-bottom: 1px solid var(--border);">
+    <a href="app.html" class="flex items-center gap-2 min-w-0" style="text-decoration: none;">
+      <div class="w-6 h-6 rounded-md flex items-center justify-center"
+           style="background: linear-gradient(135deg, #5b8def, #8b5cf6, #2dd4bf);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
           <circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.07 7.07 4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.07-7.07 4.24-4.24"/>
         </svg>
       </div>
-      <div class="flex items-baseline gap-2">
-        <span class="font-bold text-sm gradient-text">NeuroPCB</span>
-        <span id="hdr-chip-badge" class="text-xs mono px-1.5 py-0.5 rounded" style="background: var(--bg-3); color: var(--accent-2);">RK3588</span>
-      </div>
-      <span class="w-px h-5 divider mx-2"></span>
-      <span id="hdr-board-name" class="text-xs" style="color: var(--text-2);">Edge LLM Reference Board · Radxa Rock 5B compat</span>
-      <span id="hdr-perf-badge" class="badge mono" style="background: #082319; color: var(--success);"><span class="pulse-dot"></span> 6 TOPS · 8GB</span>
-      <!-- Board switcher -->
-      <select id="board-switcher" class="text-xs mono ml-2" style="background: var(--bg-3); border: 1px solid var(--border-l); color: var(--text-1); border-radius: 6px; padding: 4px 8px; width: auto;">
-        <option value="rk3588">RK3588 Edge LLM</option>
-        <option value="vesper-neurion-x1">⚛️ VESPER · NEURION X1 (Flagship)</option>
-      </select>
+      <span class="font-bold text-sm gradient-text">NeuroPCB</span>
+    </a>
+
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-1.5 ml-3 min-w-0 text-xs" style="color: var(--text-3);">
+      <span style="color: var(--text-3);">/</span>
+      <a href="app.html#/projects" class="nav-link" style="padding: 4px 8px; font-size: 12px;">Projetos</a>
+      <span style="color: var(--text-3);">/</span>
+      <span id="hdr-board-name" class="font-medium" style="color: var(--text-1); padding: 4px 0;">RK3588 Edge LLM Board</span>
+      <span id="hdr-flagship-badge" style="display: none; margin-left: 8px;">
+        <span class="badge" style="background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white;">⚛️ FLAGSHIP</span>
+      </span>
     </div>
 
-    <!-- View mode switcher -->
-    <div class="flex-1 flex justify-center">
-      <div class="flex items-center gap-0.5 p-1 rounded-lg" style="background: var(--bg-2);">
-        <div class="mode-btn active" data-mode="2d" title="Vista 2D técnica">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
-          2D
-        </div>
-        <div class="mode-btn" data-mode="3d" title="Render 3D fotorrealista">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg>
-          3D
-        </div>
-        <div class="mode-btn" data-mode="xray" title="Vista de raio-X de múltiplas camadas">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>
-          X-Ray
-        </div>
-        <div class="mode-btn" data-mode="thermal" title="Mapa de calor térmico">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z"/></svg>
-          Térmico
-        </div>
-        <div class="mode-btn" data-mode="signal" title="Fluxo de sinal animado">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-          Sinal
-        </div>
-        <div class="mode-btn" data-mode="ai" title="Inferência AI ao vivo">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10c0 5-3 8-7 9l-3-5h-3l-3 5c-4-1-6-4-6-9a10 10 0 0 1 10-10z"/></svg>
-          Inferência
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-2">
-      <button class="btn" id="open-palette" title="Command palette">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        Buscar <span class="kbd ml-1">Ctrl K</span>
+    <!-- Right actions -->
+    <div class="flex items-center gap-2 ml-auto">
+      <span id="save-status" class="text-xs mono" style="color: var(--text-3);">
+        <span class="pulse-dot" style="display: inline-block; width: 4px; height: 4px; margin-right: 4px; vertical-align: middle;"></span>
+        Auto-saved há 8 min
+      </span>
+      <span class="w-px h-5 divider mx-1"></span>
+      <button class="btn btn-sm" id="open-palette" title="Buscar (Ctrl K)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span class="kbd">Ctrl K</span>
       </button>
-      <button class="btn btn-icon" title="Notificações">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <button class="btn btn-icon btn-sm" title="Notificações">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       </button>
-      <div class="flex items-center -space-x-2 mr-1">
-        <div class="w-6 h-6 rounded-full border-2" style="background: linear-gradient(135deg, #f472b6, #a855f7); border-color: var(--bg-1);" title="Ana"></div>
-        <div class="w-6 h-6 rounded-full border-2" style="background: linear-gradient(135deg, #34d399, #2dd4bf); border-color: var(--bg-1);" title="Bruno"></div>
-        <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs" style="background: var(--bg-3); border-color: var(--bg-1); color: var(--text-2);">+2</div>
+      <button class="btn btn-sm">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Compartilhar
+      </button>
+      <div class="flex items-center -space-x-2 mx-1">
+        <div class="w-6 h-6 rounded-full border-2" style="background: linear-gradient(135deg, #f472b6, #a855f7); border-color: var(--bg-0);" title="Ana M."></div>
+        <div class="w-6 h-6 rounded-full border-2" style="background: linear-gradient(135deg, #34d399, #2dd4bf); border-color: var(--bg-0);" title="Bruno S."></div>
       </div>
-      <button class="btn primary">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <button class="btn btn-primary btn-sm" id="publish-btn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         Publicar
       </button>
     </div>
   </header>
+
+  <!-- ==================== PROJECT TABS (row 2) ==================== -->
+  <div class="h-9 flex items-center px-2 border-x-0 border-t-0" style="background: var(--bg-1); border-bottom: 1px solid var(--border);">
+    <div class="flex items-center gap-0">
+      <a class="project-tab" href="javascript:void(0)" id="ptab-overview">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Overview
+      </a>
+      <a class="project-tab active" href="javascript:void(0)" id="ptab-layout">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+        Layout PCB
+      </a>
+      <a class="project-tab" href="javascript:void(0)" id="ptab-simulate">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Simular
+      </a>
+      <a class="project-tab" href="javascript:void(0)" id="ptab-export">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar
+      </a>
+      <a class="project-tab" href="javascript:void(0)" id="ptab-bom">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        BOM
+      </a>
+      <a class="project-tab" href="javascript:void(0)" id="ptab-activity">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Atividade
+      </a>
+    </div>
+
+    <!-- Layout sub-toolbar: render modes (visible only on Layout tab) -->
+    <div id="render-modes" class="ml-auto flex items-center gap-0.5 p-0.5 rounded-md" style="background: var(--bg-2);">
+      <div class="mode-btn active" data-mode="2d" title="Vista 2D técnica">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+        2D
+      </div>
+      <div class="mode-btn" data-mode="3d" title="Render 3D">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg>
+        3D
+      </div>
+      <div class="mode-btn" data-mode="xray" title="X-Ray multicamadas">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>
+        X-Ray
+      </div>
+      <div class="mode-btn" data-mode="thermal" title="Mapa térmico">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z"/></svg>
+        Térmico
+      </div>
+      <div class="mode-btn" data-mode="signal" title="Fluxo de sinal">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Sinal
+      </div>
+      <div class="mode-btn" data-mode="ai" title="Inferência AI">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10c0 5-3 8-7 9l-3-5h-3l-3 5c-4-1-6-4-6-9a10 10 0 0 1 10-10z"/></svg>
+        Inferência
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .project-tab {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 12px; font-size: 12px; font-weight: 500;
+      color: var(--text-2); border-bottom: 2px solid transparent;
+      cursor: pointer; transition: all 0.15s;
+      margin-bottom: -1px; text-decoration: none;
+    }
+    .project-tab:hover { color: var(--text-1); }
+    .project-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .mode-btn {
+      padding: 4px 10px; border-radius: 5px; font-size: 11px; font-weight: 600;
+      color: var(--text-3); cursor: pointer; transition: all 0.15s;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .mode-btn:hover { color: var(--text-1); background: var(--bg-3); }
+    .mode-btn.active {
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+  </style>
+
+  <!-- ==================== TAB CONTENT WRAPPERS ==================== -->
+  <!-- Tabs that link out to other pages will be handled via JS; Layout is the default content below. -->
+
+  <script>
+    // Project tab navigation (Figma-style)
+    (function setupProjectTabs() {
+      const boardId = new URLSearchParams(location.search).get('board') || 'rk3588';
+      const projectId = new URLSearchParams(location.search).get('project') || '';
+      const baseChip = `chip-neurion.html?from=app${projectId ? '&project=' + projectId : ''}${boardId === 'vesper-neurion-x1' ? '' : '&board=' + boardId}`;
+      const tabs = {
+        overview: { href: baseChip + '#top' },
+        layout: { stay: true },
+        simulate: { href: baseChip + '#sim-canvas' },
+        export: { href: baseChip + '#export-all' },
+        bom: { stay: true, tab: 'bom' },
+        activity: { stay: true, action: () => alert('Em breve: timeline de atividade do projeto') }
+      };
+      Object.entries(tabs).forEach(([name, cfg]) => {
+        const el = document.getElementById('ptab-' + name);
+        if (!el) return;
+        el.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (cfg.action) { cfg.action(); return; }
+          if (cfg.href) { location.href = cfg.href; return; }
+          // Stay on page (Layout is default)
+          if (cfg.tab === 'bom') {
+            // Switch left sidebar tab to BOM
+            const bomTab = document.querySelector('[data-tab="bom"]');
+            if (bomTab) bomTab.click();
+          }
+          document.querySelectorAll('.project-tab').forEach(t => t.classList.remove('active'));
+          el.classList.add('active');
+        });
+      });
+    })();
+  </script>
 
   <div class="flex-1 flex min-h-0">
 
@@ -1070,41 +1166,22 @@ function generateVesperPassives() {
 const __boardRegistry = { 'rk3588': rk3588Board, 'vesper-neurion-x1': vesperBoard };
 const board = __boardRegistry[__boardId] || rk3588Board;
 
-// Update header for the selected board
+// Update header for the selected board (Figma-style breadcrumb)
 (function updateHeaderForBoard() {
   const meta = {
     'rk3588': {
-      chip: 'RK3588',
-      title: 'Edge LLM Reference Board · Radxa Rock 5B compat',
-      perf: '6 TOPS · 8GB',
-      perfBg: '#082319', perfColor: 'var(--success)'
+      title: 'RK3588 Edge LLM Board',
+      isFlagship: false
     },
     'vesper-neurion-x1': {
-      chip: '⚛️ NEURION X1',
-      title: 'VESPER rev-A · Compute-in-Memory NPU · Flagship',
-      perf: '32 TOPS @ 0.5W · 8GB LPDDR5X',
-      perfBg: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(91,141,239,0.2))',
-      perfColor: '#a855f7'
+      title: 'VESPER rev-A · NEURION X1',
+      isFlagship: true
     }
   }[__boardId] || {};
-  const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.textContent = val; };
-  setVal('hdr-chip-badge', meta.chip);
-  setVal('hdr-board-name', meta.title);
-  const pb = document.getElementById('hdr-perf-badge');
-  if (pb && meta.perf) {
-    pb.innerHTML = `<span class="pulse-dot"></span> ${meta.perf}`;
-    pb.style.background = meta.perfBg;
-    pb.style.color = meta.perfColor;
-  }
-  const sw = document.getElementById('board-switcher');
-  if (sw) {
-    sw.value = __boardId;
-    sw.addEventListener('change', e => {
-      const u = new URL(location.href);
-      u.searchParams.set('board', e.target.value);
-      location.href = u.toString();
-    });
-  }
+  const nameEl = document.getElementById('hdr-board-name');
+  if (nameEl && meta.title) nameEl.textContent = meta.title;
+  const flagEl = document.getElementById('hdr-flagship-badge');
+  if (flagEl) flagEl.style.display = meta.isFlagship ? 'inline-block' : 'none';
   document.title = `NeuroPCB — ${meta.title || 'Editor'}`;
 })();
 
