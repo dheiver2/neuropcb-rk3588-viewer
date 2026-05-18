@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>NeuroPCB — RK3588 Edge AI Reference Board</title>
+<title>NeuroPCB — Editor</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script type="importmap">
@@ -241,11 +241,16 @@
       </div>
       <div class="flex items-baseline gap-2">
         <span class="font-bold text-sm gradient-text">NeuroPCB</span>
-        <span class="text-xs mono px-1.5 py-0.5 rounded" style="background: var(--bg-3); color: var(--accent-2);">RK3588</span>
+        <span id="hdr-chip-badge" class="text-xs mono px-1.5 py-0.5 rounded" style="background: var(--bg-3); color: var(--accent-2);">RK3588</span>
       </div>
       <span class="w-px h-5 divider mx-2"></span>
-      <span class="text-xs" style="color: var(--text-2);">Edge LLM Reference Board · Radxa Rock 5B compat</span>
-      <span class="badge mono" style="background: #082319; color: var(--success);"><span class="pulse-dot"></span> 6 TOPS · 8GB</span>
+      <span id="hdr-board-name" class="text-xs" style="color: var(--text-2);">Edge LLM Reference Board · Radxa Rock 5B compat</span>
+      <span id="hdr-perf-badge" class="badge mono" style="background: #082319; color: var(--success);"><span class="pulse-dot"></span> 6 TOPS · 8GB</span>
+      <!-- Board switcher -->
+      <select id="board-switcher" class="text-xs mono ml-2" style="background: var(--bg-3); border: 1px solid var(--border-l); color: var(--text-1); border-radius: 6px; padding: 4px 8px; width: auto;">
+        <option value="rk3588">RK3588 Edge LLM</option>
+        <option value="vesper-neurion-x1">⚛️ VESPER · NEURION X1 (Flagship)</option>
+      </select>
     </div>
 
     <!-- View mode switcher -->
@@ -593,9 +598,11 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // ===================================================================
-// DATA MODEL — same board as before, with thermal hotspots
+// DATA MODEL — board registry (RK3588 + VESPER NEURION X1)
 // ===================================================================
-const board = {
+const __boardId = new URLSearchParams(location.search).get('board') || 'rk3588';
+
+const rk3588Board = {
   size: { w: 600, h: 400 },
   mountingHoles: [
     { x: 25, y: 25 }, { x: 575, y: 25 }, { x: 25, y: 375 }, { x: 575, y: 375 }
@@ -773,6 +780,333 @@ const board = {
   ],
   vias: genVias()
 };
+
+// ===================================================================
+// VESPER · NEURION X1 Reference Board (Flagship · CIM NPU)
+// ===================================================================
+const vesperBoard = {
+  size: { w: 600, h: 400 },
+  mountingHoles: [
+    { x: 25, y: 25 }, { x: 575, y: 25 }, { x: 25, y: 375 }, { x: 575, y: 375 }
+  ],
+  components: [
+    // ===== CENTRAL: NEURION X1 (flagship chip) =====
+    { id: "U1", type: "bga", label: "NEURION X1", refDes: "U1",
+      desc: "Compute-in-Memory NPU · 32 TOPS · 64 TOPS/W · 4nm TSMC N4P · primeiro chip do mundo desenhado para LLMs destilados",
+      manufacturer: "Voxion Labs (NeuroPCB)", partNumber: "NEURION-X1-D-BR",
+      datasheet: "chip-neurion.html",
+      thermal: 68, x: 220, y: 130, w: 160, h: 160, package: "LGA-2048 · 23×23mm",
+      flagship: true,
+      props: {
+        Arch: "Compute-in-Memory · 64 tiles 256×256",
+        Performance: "32 TOPS @ INT4 · 16 TOPS @ INT8",
+        Efficiency: "64 TOPS/W (11× vs RK3588)",
+        Memory: "128 MB SRAM on-die + 4 GB HBM2e",
+        Process: "TSMC N4P (4nm)",
+        Voltage: "0.6V core / 1.0V HBM / 1.8V I/O",
+        TDP: "0.5W typical · 5W peak",
+        Innovation: "Sparse Dataflow + Speculative Decode HW"
+      },
+      modelRef: "qwen25-15b", pins: genBGA(16, 16) },
+
+    // ===== 4× LPDDR5X around NEURION X1 =====
+    { id: "U2", type: "bga", label: "LPDDR5X-8533", refDes: "U2",
+      desc: "Micron LPDDR5X · 16 Gbit · 8533 Mbps · ch.A",
+      manufacturer: "Micron", partNumber: "MT53D1G32D4DT-046",
+      datasheet: "https://www.micron.com/products/dram/lpdram",
+      thermal: 54, x: 95, y: 80, w: 90, h: 70, package: "FBGA-200",
+      props: { Capacity: "16 Gbit (2 GB)", DataRate: "8533 Mbps", Voltage: "0.5V VDDQ" },
+      pins: genBGA(10, 8) },
+    { id: "U3", type: "bga", label: "LPDDR5X-8533", refDes: "U3",
+      desc: "Micron LPDDR5X · 16 Gbit · 8533 Mbps · ch.B",
+      manufacturer: "Micron", partNumber: "MT53D1G32D4DT-046",
+      thermal: 53, x: 415, y: 80, w: 90, h: 70, package: "FBGA-200",
+      props: { Capacity: "16 Gbit (2 GB)", DataRate: "8533 Mbps" },
+      pins: genBGA(10, 8) },
+    { id: "U4", type: "bga", label: "LPDDR5X-8533", refDes: "U4",
+      desc: "Micron LPDDR5X · 16 Gbit · 8533 Mbps · ch.C",
+      manufacturer: "Micron", partNumber: "MT53D1G32D4DT-046",
+      thermal: 52, x: 95, y: 270, w: 90, h: 70, package: "FBGA-200",
+      props: { Capacity: "16 Gbit (2 GB)", DataRate: "8533 Mbps" },
+      pins: genBGA(10, 8) },
+    { id: "U5", type: "bga", label: "LPDDR5X-8533", refDes: "U5",
+      desc: "Micron LPDDR5X · 16 Gbit · 8533 Mbps · ch.D · total 8 GB",
+      manufacturer: "Micron", partNumber: "MT53D1G32D4DT-046",
+      thermal: 51, x: 415, y: 270, w: 90, h: 70, package: "FBGA-200",
+      props: { Capacity: "16 Gbit (2 GB)", DataRate: "8533 Mbps" },
+      pins: genBGA(10, 8) },
+
+    // ===== Support ICs =====
+    { id: "U6", type: "qfn", label: "TPS6594", refDes: "U6",
+      desc: "TI Automotive PMIC · 5 buck + 4 LDO · I²C/SPI",
+      manufacturer: "Texas Instruments", partNumber: "TPS6594-Q1",
+      datasheet: "https://www.ti.com/product/TPS6594-Q1",
+      thermal: 64, x: 30, y: 175, w: 50, h: 50, package: "VQFN-56",
+      props: { Vin: "3.0-5.5V", Bucks: "5× up to 3.5A", LDOs: "4× 500mA", Eff: "95%" },
+      pins: genQFN(50, 50, 14) },
+    { id: "U7", type: "qfp", label: "AQR113C", refDes: "U7",
+      desc: "Marvell 25GbE PHY · IEEE 802.3by · PCIe Gen3",
+      manufacturer: "Marvell", partNumber: "AQR113C-AKXC",
+      datasheet: "https://www.marvell.com/products/ethernet-transceivers.html",
+      thermal: 58, x: 520, y: 175, w: 55, h: 55, package: "QFN-72",
+      props: { Speeds: "25G/10G/5G/2.5G/1G", Interface: "USXGMII", Standard: "IEEE 802.3by" },
+      pins: genQFN(55, 55, 18) },
+    { id: "U8", type: "bga", label: "JHL8240", refDes: "U8",
+      desc: "Intel Goshen Ridge · USB4 / Thunderbolt 4 controller · 40 Gbps",
+      manufacturer: "Intel", partNumber: "JHL8240",
+      datasheet: "https://www.intel.com/content/www/us/en/products/sku/216816",
+      thermal: 56, x: 30, y: 80, w: 50, h: 50, package: "FCBGA-225",
+      props: { Speed: "40 Gbps · USB4 v2", Ports: "2× downstream", DPalt: "DisplayPort 1.4" },
+      pins: genBGA(15, 15) },
+    { id: "U9", type: "qfp", label: "STM32G491", refDes: "U9",
+      desc: "STMicro Cortex-M4F · BMC + power sequencing · 170 MHz",
+      manufacturer: "STMicroelectronics", partNumber: "STM32G491KEU6",
+      datasheet: "https://www.st.com/en/microcontrollers-microprocessors/stm32g491.html",
+      thermal: 42, x: 520, y: 280, w: 40, h: 40, package: "LQFP-48",
+      props: { Core: "Cortex-M4F", Freq: "170 MHz", Flash: "512 KB", SRAM: "112 KB" },
+      pins: genQFN(40, 40, 12) },
+
+    // ===== Connectors =====
+    { id: "J1", type: "usbc", label: "USB-C PD", refDes: "J1",
+      desc: "GCT USB-C 24-pin · USB4 v2 · PD 3.1 · 140W",
+      manufacturer: "GCT", partNumber: "USB4085-30-A",
+      thermal: 32, x: 8, y: 30, w: 40, h: 36, package: "TYPE-C-24P",
+      props: { Standard: "USB4 v2", Power: "140W PD 3.1", Data: "40 Gbps" },
+      pins: [
+        {id:"VBUS",label:"VBUS",x:40,y:6,dir:"power"},
+        {id:"TX",label:"TX",x:40,y:14,dir:"output"},
+        {id:"RX",label:"RX",x:40,y:22,dir:"input"},
+        {id:"CC",label:"CC",x:40,y:30,dir:"bidirectional"},
+        {id:"GND",label:"GND",x:40,y:36,dir:"ground"}
+      ]},
+    { id: "J2", type: "header", label: "RJ45 25GbE", refDes: "J2",
+      desc: "Bel Fuse RJ45 25GBASE-T · magnetics integrado",
+      manufacturer: "Bel Fuse", partNumber: "SI-60059-F",
+      thermal: 38, x: 555, y: 30, w: 40, h: 40, package: "MagJack",
+      props: { Speed: "25GBASE-T", Magnetics: "integrated", LEDs: "yellow/green" },
+      pins: [
+        {id:"TX",label:"TX",x:0,y:10,dir:"output"},
+        {id:"RX",label:"RX",x:0,y:25,dir:"input"}
+      ]},
+    { id: "J3", type: "header", label: "HDMI 2.1", refDes: "J3",
+      desc: "JAE HDMI Type-A · 12 Gbps/lane · 8K@60",
+      manufacturer: "JAE", partNumber: "HDMI-A-23A",
+      thermal: 28, x: 555, y: 355, w: 38, h: 28, package: "HDMI-A",
+      props: { Version: "HDMI 2.1", Bandwidth: "48 Gbps", Max: "8K@60Hz" },
+      pins: [
+        {id:"TMDS0",label:"TMDS0",x:0,y:6,dir:"output"},
+        {id:"TMDS1",label:"TMDS1",x:0,y:14,dir:"output"},
+        {id:"TMDS2",label:"TMDS2",x:0,y:22,dir:"output"}
+      ]},
+    { id: "J4", type: "header", label: "M.2 M-key", refDes: "J4",
+      desc: "Foxconn M.2 2280 · PCIe Gen4 x4 · NVMe SSD",
+      manufacturer: "Foxconn", partNumber: "AS0B826-S78N7-7H",
+      thermal: 34, x: 200, y: 355, w: 220, h: 14, package: "M.2 2280 M-key",
+      props: { Standard: "PCIe Gen4 x4 · 7.88 GB/s", FormFactor: "2280" },
+      pins: Array.from({length: 12}, (_, i) => ({
+        id:"m"+i, label:"M"+(i+1), x:10+i*18, y:14, dir:"bidirectional"
+      }))},
+    { id: "J5", type: "header", label: "40-pin GPIO", refDes: "J5",
+      desc: "Samtec 2×20 header · RPi compatível · 3.3V tolerant",
+      manufacturer: "Samtec", partNumber: "TSW-120-07-G-D",
+      thermal: 25, x: 8, y: 350, w: 180, h: 20, package: "2×20 P=2.54mm",
+      props: { Pitch: "2.54 mm", Pins: "40", Compat: "RPi GPIO HAT" },
+      pins: Array.from({length: 40}, (_, i) => ({
+        id:"p"+i, label:"P"+(i+1), x:4+(i%20)*9, y:i<20?0:20, dir:"bidirectional"
+      }))},
+
+    // ===== Indicators =====
+    { id: "D1", type: "led", label: "PWR", refDes: "D1",
+      desc: "LED indicador · verde · 0603",
+      manufacturer: "Kingbright", partNumber: "KP-1608SGC",
+      thermal: 24, x: 90, y: 360, w: 8, h: 6, package: "0603",
+      pins: [{id:"a",label:"A",x:0,y:3,dir:"input"},{id:"k",label:"K",x:8,y:3,dir:"ground"}]},
+    { id: "D2", type: "led", label: "ACT", refDes: "D2", color: "blue",
+      desc: "LED de atividade · azul",
+      manufacturer: "Kingbright", partNumber: "KP-1608QBC-D",
+      thermal: 24, x: 105, y: 360, w: 8, h: 6, package: "0603",
+      pins: [{id:"a",label:"A",x:0,y:3,dir:"input"},{id:"k",label:"K",x:8,y:3,dir:"ground"}]},
+    { id: "D3", type: "led", label: "NPU", refDes: "D3",
+      desc: "LED RGB indicador de NPU ativo · WS2812 compat",
+      manufacturer: "Lite-On", partNumber: "LTST-S326KGJRKT",
+      thermal: 25, x: 120, y: 360, w: 8, h: 6, package: "PLCC-4",
+      pins: [{id:"a",label:"A",x:0,y:3,dir:"input"},{id:"k",label:"K",x:8,y:3,dir:"ground"}]},
+
+    // ===== Clocks =====
+    { id: "Y1", type: "crystal", label: "25 MHz TCXO", refDes: "Y1",
+      desc: "ECS TCXO 25 MHz · ±0.5 ppm · clock principal NEURION",
+      manufacturer: "ECS Inc", partNumber: "ECS-250-12-30B-DU",
+      thermal: 28, x: 200, y: 90, w: 28, h: 14, package: "3225 SMD",
+      props: { Frequency: "25.000 MHz", Tolerance: "±0.5 ppm", Type: "TCXO" },
+      pins: [{id:"1",label:"1",x:0,y:7,dir:"bidirectional"},{id:"2",label:"2",x:28,y:7,dir:"bidirectional"}]},
+    { id: "Y2", type: "crystal", label: "32.768kHz", refDes: "Y2",
+      desc: "Cristal RTC 32.768 kHz · backup de clock",
+      manufacturer: "Abracon", partNumber: "ABS06-32.768KHZ-T",
+      thermal: 24, x: 200, y: 295, w: 20, h: 10, package: "3215 SMD",
+      props: { Frequency: "32.768 kHz", Tolerance: "±20 ppm" },
+      pins: [{id:"1",label:"1",x:0,y:5,dir:"bidirectional"},{id:"2",label:"2",x:20,y:5,dir:"bidirectional"}]},
+
+    // ===== Passives (decoupling caps around NEURION X1) =====
+    ...generateVesperPassives()
+  ],
+  traces: [
+    // Memory bus (NEURION ↔ 4× LPDDR5X)
+    { id:"v1", net:"MEM_A", layer:"top", color:"#d4a017", path:"M 220 145 L 200 145 L 200 105 L 185 105" },
+    { id:"v2", net:"MEM_A", layer:"top", color:"#d4a017", path:"M 220 155 L 195 155 L 195 115 L 185 115" },
+    { id:"v3", net:"MEM_B", layer:"top", color:"#d4a017", path:"M 380 145 L 405 145 L 405 105 L 415 105" },
+    { id:"v4", net:"MEM_B", layer:"top", color:"#d4a017", path:"M 380 155 L 410 155 L 410 115 L 415 115" },
+    { id:"v5", net:"MEM_C", layer:"top", color:"#d4a017", path:"M 220 275 L 200 275 L 200 305 L 185 305" },
+    { id:"v6", net:"MEM_C", layer:"top", color:"#d4a017", path:"M 220 265 L 195 265 L 195 295 L 185 295" },
+    { id:"v7", net:"MEM_D", layer:"top", color:"#d4a017", path:"M 380 275 L 405 275 L 405 305 L 415 305" },
+    { id:"v8", net:"MEM_D", layer:"top", color:"#d4a017", path:"M 380 265 L 410 265 L 410 295 L 415 295" },
+    // Power rails
+    { id:"v9", net:"VCC_0V6", layer:"top", color:"#cf3838", path:"M 80 200 L 220 200" },
+    { id:"v10", net:"VCC_1V0", layer:"top", color:"#cf3838", path:"M 80 190 L 150 190 L 150 145 L 185 145" },
+    { id:"v11", net:"VCC_1V8", layer:"top", color:"#cf3838", path:"M 80 210 L 150 210 L 150 270 L 185 270" },
+    { id:"v12", net:"VBUS_5V", layer:"top", color:"#cf3838", path:"M 48 36 L 80 36 L 80 180" },
+    // PCIe to M.2
+    { id:"v13", net:"PCIE_TX0", layer:"top", color:"#3a78c4", path:"M 300 290 L 300 355 L 315 355" },
+    { id:"v14", net:"PCIE_TX1", layer:"top", color:"#3a78c4", path:"M 310 290 L 310 355 L 325 355" },
+    { id:"v15", net:"PCIE_RX0", layer:"top", color:"#3a78c4", path:"M 320 290 L 320 355 L 335 355" },
+    { id:"v16", net:"PCIE_RX1", layer:"top", color:"#3a78c4", path:"M 330 290 L 330 355 L 345 355" },
+    // USB4 to JHL8240 to USB-C
+    { id:"v17", net:"USB4_TX", layer:"top", color:"#a855f7", path:"M 220 130 L 80 130 L 80 100" },
+    { id:"v18", net:"USB4_RX", layer:"top", color:"#a855f7", path:"M 220 140 L 90 140 L 90 110" },
+    { id:"v19", net:"USB4_OUT", layer:"top", color:"#a855f7", path:"M 30 90 L 20 90 L 20 44" },
+    // 25GbE to PHY to RJ45
+    { id:"v20", net:"ETH_TX", layer:"top", color:"#3aaa9c", path:"M 380 130 L 520 130 L 520 195" },
+    { id:"v21", net:"ETH_RX", layer:"top", color:"#3aaa9c", path:"M 380 140 L 510 140 L 510 195" },
+    { id:"v22", net:"ETH_OUT", layer:"top", color:"#3aaa9c", path:"M 555 50 L 545 50 L 545 175" },
+    // HDMI
+    { id:"v23", net:"HDMI", layer:"top", color:"#ec4899", path:"M 380 280 L 540 280 L 540 365" },
+    // GPIO from BMC
+    { id:"v24", net:"GPIO", layer:"top", color:"#fbbf24", path:"M 520 295 L 100 295 L 100 350" },
+    // Clock from TCXO
+    { id:"v25", net:"REFCLK", layer:"top", color:"#a855f7", path:"M 228 95 L 250 95 L 250 130" },
+    // RTC
+    { id:"v26", net:"RTC", layer:"top", color:"#94a3b8", path:"M 220 300 L 280 300 L 280 280" },
+    // Ground returns (bottom)
+    { id:"v27", net:"GND", layer:"bottom", color:"#6b7280", path:"M 300 290 L 300 380 L 100 380" },
+    { id:"v28", net:"GND", layer:"bottom", color:"#6b7280", path:"M 300 130 L 300 50 L 500 50" },
+    { id:"v29", net:"GND", layer:"bottom", color:"#6b7280", path:"M 220 200 L 100 200 L 100 250" },
+    { id:"v30", net:"GND", layer:"bottom", color:"#6b7280", path:"M 380 200 L 500 200 L 500 250" },
+  ],
+  vias: [
+    {id:"vv1",x:200,y:145},{id:"vv2",x:195,y:155},{id:"vv3",x:405,y:145},{id:"vv4",x:410,y:155},
+    {id:"vv5",x:200,y:275},{id:"vv6",x:195,y:265},{id:"vv7",x:405,y:275},{id:"vv8",x:410,y:265},
+    {id:"vv9",x:150,y:190},{id:"vv10",x:150,y:210},{id:"vv11",x:150,y:270},
+    {id:"vv12",x:300,y:290},{id:"vv13",x:310,y:290},{id:"vv14",x:320,y:290},{id:"vv15",x:330,y:290},
+    {id:"vv16",x:80,y:130},{id:"vv17",x:90,y:140},{id:"vv18",x:520,y:130},{id:"vv19",x:510,y:140},
+    {id:"vv20",x:540,y:280},{id:"vv21",x:100,y:295},{id:"vv22",x:250,y:95},{id:"vv23",x:280,y:300},
+    {id:"vv24",x:300,y:380},{id:"vv25",x:300,y:50},{id:"vv26",x:100,y:200},{id:"vv27",x:500,y:200},
+    // Add many vias around NEURION for power/ground
+    ...Array.from({length: 40}, (_, i) => ({
+      id: "vp"+i,
+      x: 220 + (i % 8) * 22 + (Math.floor(i / 8) % 2) * 11,
+      y: 130 + Math.floor(i / 8) * 32
+    }))
+  ]
+};
+
+function generateVesperPassives() {
+  const items = [];
+  let cI = 1, rI = 1, lI = 1;
+  // Decoupling cap ring around NEURION X1 (huge chip needs lots of decoupling)
+  const decoupRingPositions = [
+    // Top row
+    {x:230,y:122,t:"cap"},{x:250,y:122,t:"cap"},{x:270,y:122,t:"cap"},{x:290,y:122,t:"cap"},
+    {x:310,y:122,t:"cap"},{x:330,y:122,t:"cap"},{x:350,y:122,t:"cap"},{x:370,y:122,t:"cap"},
+    // Bottom row
+    {x:230,y:295,t:"cap"},{x:250,y:295,t:"cap"},{x:270,y:295,t:"cap"},{x:290,y:295,t:"cap"},
+    {x:310,y:295,t:"cap"},{x:330,y:295,t:"cap"},{x:350,y:295,t:"cap"},{x:370,y:295,t:"cap"},
+    // Left col
+    {x:212,y:150,t:"cap"},{x:212,y:170,t:"cap"},{x:212,y:190,t:"cap"},
+    {x:212,y:220,t:"cap"},{x:212,y:240,t:"cap"},{x:212,y:265,t:"cap"},
+    // Right col
+    {x:388,y:150,t:"cap"},{x:388,y:170,t:"cap"},{x:388,y:190,t:"cap"},
+    {x:388,y:220,t:"cap"},{x:388,y:240,t:"cap"},{x:388,y:265,t:"cap"},
+    // Bulk caps near PMIC
+    {x:5,y:240,t:"cap-y"},{x:18,y:240,t:"cap-y"},{x:35,y:240,t:"cap-y"},
+    {x:60,y:240,t:"cap-y"},{x:75,y:240,t:"cap-y"},
+    // Inductors for buck converters
+    {x:25,y:155,t:"ind"},{x:45,y:155,t:"ind"},{x:65,y:155,t:"ind"},
+    // Caps near RAM
+    {x:100,y:158,t:"cap"},{x:115,y:158,t:"cap"},{x:130,y:158,t:"cap"},{x:145,y:158,t:"cap"},
+    {x:420,y:158,t:"cap"},{x:435,y:158,t:"cap"},{x:450,y:158,t:"cap"},{x:465,y:158,t:"cap"},
+    {x:100,y:348,t:"cap"},{x:115,y:348,t:"cap"},{x:130,y:348,t:"cap"},
+    {x:420,y:348,t:"cap"},{x:435,y:348,t:"cap"},{x:450,y:348,t:"cap"},
+    // Pull-up/down resistors
+    {x:530,y:240,t:"res"},{x:545,y:240,t:"res"},{x:560,y:240,t:"res"},
+    {x:530,y:340,t:"res"},{x:545,y:340,t:"res"},
+    // Termination resistors near connectors
+    {x:165,y:110,t:"res"},{x:175,y:110,t:"res"},
+    {x:395,y:110,t:"res"},{x:405,y:110,t:"res"},
+  ];
+  for (const p of decoupRingPositions) {
+    const ind = p.t === "ind", res = p.t === "res", capY = p.t === "cap-y";
+    items.push({
+      id: ind ? `L${lI++}` : res ? `R${rI++}` : `C${cI++}`,
+      type: ind ? "inductor" : res ? "resistor" : "capacitor",
+      capStyle: capY ? "yellow" : "brown",
+      label: ind ? "10µH" : res ? "10kΩ" : (capY ? "47µF" : "100nF"),
+      refDes: ind ? `L${lI}` : res ? `R${rI}` : `C${cI}`,
+      desc: ind ? "Indutor 10µH 0805 · buck output" :
+            res ? "Resistor 10kΩ 0402 · 1%" :
+            (capY ? "Capacitor tântalo 47µF 6.3V · bulk" : "Capacitor cerâmico 100nF X7R 0402 · decoupling"),
+      manufacturer: ind ? "Würth Elektronik" : res ? "Yageo" : "Murata",
+      partNumber: ind ? "WE-PD2-100uH" : res ? "RC0402FR-0710KL" : (capY ? "GRM21BR60J476ME15" : "GRM188R71C104KA01"),
+      x: p.x, y: p.y, w: ind ? 8 : (capY ? 8 : 6), h: ind ? 6 : (capY ? 4 : 3),
+      thermal: 26 + Math.random() * 5,
+      package: ind ? "0805" : (capY ? "0805" : "0402"),
+      pins: [
+        {id:"1", x:0, y:(ind?6:capY?4:3)/2, dir:"bidirectional"},
+        {id:"2", x:ind?8:capY?8:6, y:(ind?6:capY?4:3)/2, dir:"bidirectional"}
+      ]
+    });
+  }
+  return items;
+}
+
+const __boardRegistry = { 'rk3588': rk3588Board, 'vesper-neurion-x1': vesperBoard };
+const board = __boardRegistry[__boardId] || rk3588Board;
+
+// Update header for the selected board
+(function updateHeaderForBoard() {
+  const meta = {
+    'rk3588': {
+      chip: 'RK3588',
+      title: 'Edge LLM Reference Board · Radxa Rock 5B compat',
+      perf: '6 TOPS · 8GB',
+      perfBg: '#082319', perfColor: 'var(--success)'
+    },
+    'vesper-neurion-x1': {
+      chip: '⚛️ NEURION X1',
+      title: 'VESPER rev-A · Compute-in-Memory NPU · Flagship',
+      perf: '32 TOPS @ 0.5W · 8GB LPDDR5X',
+      perfBg: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(91,141,239,0.2))',
+      perfColor: '#a855f7'
+    }
+  }[__boardId] || {};
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.textContent = val; };
+  setVal('hdr-chip-badge', meta.chip);
+  setVal('hdr-board-name', meta.title);
+  const pb = document.getElementById('hdr-perf-badge');
+  if (pb && meta.perf) {
+    pb.innerHTML = `<span class="pulse-dot"></span> ${meta.perf}`;
+    pb.style.background = meta.perfBg;
+    pb.style.color = meta.perfColor;
+  }
+  const sw = document.getElementById('board-switcher');
+  if (sw) {
+    sw.value = __boardId;
+    sw.addEventListener('change', e => {
+      const u = new URL(location.href);
+      u.searchParams.set('board', e.target.value);
+      location.href = u.toString();
+    });
+  }
+  document.title = `NeuroPCB — ${meta.title || 'Editor'}`;
+})();
 
 function genBGA(c, r) {
   const pins = [];
@@ -1042,13 +1376,60 @@ function renderComponents() {
 function renderPackage(c, cg) {
   const t = c.type;
   if (t === "bga") {
-    el("rect",{class:"pkg-body pkg-outline",width:c.w,height:c.h,fill:"url(#bga-fill)",stroke:"#2a2f3a","stroke-width":0.5,rx:2},cg);
-    el("rect",{x:1,y:1,width:c.w-2,height:c.h*0.3,fill:"white",opacity:0.04,rx:1},cg);
-    el("circle",{cx:6,cy:6,r:1.5,fill:"#5b8def",opacity:0.9},cg);
-    el("circle",{cx:6,cy:6,r:2.5,fill:"none",stroke:"#5b8def","stroke-width":0.3,opacity:0.5},cg);
-    el("text",{class:"silkscreen",x:c.w/2,y:c.h/2+1,"font-size":Math.min(c.w/8,11),"font-weight":600,fill:"rgba(255,255,255,0.7)",text:c.label},cg);
-    el("text",{class:"silkscreen",x:c.w/2,y:c.h/2+11,"font-size":7,fill:"rgba(255,255,255,0.4)",text:c.package},cg);
-    for (const p of c.pins) el("circle",{class:"pin-pad",cx:p.x,cy:p.y,r:1.5,fill:"#d4a017",opacity:0.3},cg);
+    // Special render for flagship NEURION X1 chip
+    if (c.flagship) {
+      // Glow halo behind chip
+      el("rect", {x:-8, y:-8, width:c.w+16, height:c.h+16, rx:8,
+        fill:"none", stroke:"#8b5cf6", "stroke-width":2, opacity:0.4,
+        filter:"drop-shadow(0 0 12px #8b5cf6) drop-shadow(0 0 24px #5b8def)"}, cg);
+      // Chip body with purple gradient
+      el("rect", {class:"pkg-body pkg-outline", width:c.w, height:c.h, rx:3,
+        fill:"#0a0c14", stroke:"#5b8def", "stroke-width":1}, cg);
+      // Inner die with purple radial
+      el("rect", {x:c.w*0.08, y:c.h*0.08, width:c.w*0.84, height:c.h*0.84,
+        fill:"#1a1530", stroke:"#3a2a5e", "stroke-width":0.5, rx:2}, cg);
+      // Top reflection
+      el("rect", {x:c.w*0.08, y:c.h*0.08, width:c.w*0.84, height:c.h*0.3,
+        fill:"white", opacity:0.06, rx:2}, cg);
+      // CIM tile grid visualization (8×8 = 64 tiles)
+      const tileSize = c.w * 0.62 / 8;
+      const startX = c.w * 0.19, startY = c.h * 0.32;
+      for (let r=0; r<8; r++) for (let col=0; col<8; col++) {
+        el("rect", {x:startX+col*tileSize, y:startY+r*tileSize,
+          width:tileSize*0.8, height:tileSize*0.8,
+          fill:"#5b8def", opacity:0.12 + Math.random()*0.18, rx:0.5}, cg);
+      }
+      // NEURION text
+      el("text", {class:"silkscreen", x:c.w/2, y:c.h*0.26,
+        "font-size":Math.min(c.w/9, 14), "font-weight":800,
+        fill:"#a78bfa", style:"letter-spacing: -0.5px;",
+        text:"NEURION"}, cg);
+      el("text", {class:"silkscreen", x:c.w/2, y:c.h*0.85,
+        "font-size":Math.min(c.w/12, 10), "font-weight":700,
+        fill:"#5b8def",
+        text:"X1"}, cg);
+      el("text", {class:"silkscreen", x:c.w/2, y:c.h*0.92,
+        "font-size":5, fill:"rgba(167,139,250,0.7)",
+        text:"CIM · 32 TOPS · 4nm"}, cg);
+      // Pin 1 marker
+      el("circle", {cx:c.w*0.12, cy:c.h*0.12, r:2, fill:"#8b5cf6", opacity:0.95}, cg);
+      el("circle", {cx:c.w*0.12, cy:c.h*0.12, r:3.5, fill:"none",
+        stroke:"#8b5cf6", "stroke-width":0.4, opacity:0.6}, cg);
+      // LGA pads (subtle, around perimeter)
+      for (const p of c.pins) {
+        el("rect", {class:"pin-pad", x:p.x-1, y:p.y-1, width:2, height:2,
+          fill:"#d4a017", opacity:0.25, rx:0.3}, cg);
+      }
+    } else {
+      // Standard BGA render
+      el("rect",{class:"pkg-body pkg-outline",width:c.w,height:c.h,fill:"url(#bga-fill)",stroke:"#2a2f3a","stroke-width":0.5,rx:2},cg);
+      el("rect",{x:1,y:1,width:c.w-2,height:c.h*0.3,fill:"white",opacity:0.04,rx:1},cg);
+      el("circle",{cx:6,cy:6,r:1.5,fill:"#5b8def",opacity:0.9},cg);
+      el("circle",{cx:6,cy:6,r:2.5,fill:"none",stroke:"#5b8def","stroke-width":0.3,opacity:0.5},cg);
+      el("text",{class:"silkscreen",x:c.w/2,y:c.h/2+1,"font-size":Math.min(c.w/8,11),"font-weight":600,fill:"rgba(255,255,255,0.7)",text:c.label},cg);
+      el("text",{class:"silkscreen",x:c.w/2,y:c.h/2+11,"font-size":7,fill:"rgba(255,255,255,0.4)",text:c.package},cg);
+      for (const p of c.pins) el("circle",{class:"pin-pad",cx:p.x,cy:p.y,r:1.5,fill:"#d4a017",opacity:0.3},cg);
+    }
   }
   else if (t === "qfn" || t === "qfp") {
     el("rect",{class:"pkg-body pkg-outline",width:c.w,height:c.h,fill:"url(#chip-fill)",stroke:"#1a1d24","stroke-width":0.5,rx:1},cg);

@@ -159,6 +159,10 @@
 
     <div style="margin-left: auto; display: flex; gap: 8px; align-items: center;">
       <span class="text-xs text-faint mono">Auto-saved · há 8 min</span>
+      <a class="btn btn-sm btn-primary" href="editor.html?board=vesper-neurion-x1&from=app" style="background: linear-gradient(135deg, #8b5cf6, #5b8def);">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg>
+        Abrir no Editor PCB →
+      </a>
       <button class="btn btn-sm" onclick="window.toast('🔗 Link copiado para área de transferência')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         Compartilhar
@@ -203,7 +207,7 @@
         <span class="text-accent">~11× mais eficiente</span> que o Rockchip RK3588.
       </p>
 
-      <div style="display: flex; gap: 24px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
+      <div style="display: flex; gap: 24px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 24px;">
         <div><div class="text-3xl font-bold gradient-text">64</div><div class="text-xs text-faint mono">TOPS/W</div></div>
         <div style="width: 1px; height: 32px; background: var(--border);"></div>
         <div><div class="text-3xl font-bold gradient-text">180</div><div class="text-xs text-faint mono">TOK/S · QWEN 1.5B</div></div>
@@ -211,6 +215,17 @@
         <div><div class="text-3xl font-bold gradient-text">128MB</div><div class="text-xs text-faint mono">ON-DIE SRAM</div></div>
         <div style="width: 1px; height: 32px; background: var(--border);"></div>
         <div><div class="text-3xl font-bold gradient-text">4nm</div><div class="text-xs text-faint mono">TSMC N4P</div></div>
+      </div>
+
+      <!-- Quick action: open PCB in editor -->
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a class="btn btn-primary btn-lg" href="editor.html?board=vesper-neurion-x1&from=app" style="background: linear-gradient(135deg, #8b5cf6, #5b8def); box-shadow: 0 0 24px rgba(139,92,246,0.4);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg>
+          Visualizar PCB no Editor
+        </a>
+        <a class="btn btn-outline btn-lg" href="#sim-canvas" onclick="document.querySelector('#sim-canvas').scrollIntoView({behavior:'smooth'}); return false;">
+          ▶ Rodar simulador
+        </a>
       </div>
     </div>
 
